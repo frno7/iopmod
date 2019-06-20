@@ -1,0 +1,35 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0
+
+set -e
+set -o pipefail
+
+parse_args()
+{
+	while [ $# != 0 ]
+	do
+		local arg="$1"
+		shift
+
+		case "$arg" in
+			-o)
+				outfile="$1"
+				shift
+				;;
+			*)
+				infile="$arg"
+				;;
+		esac
+	done
+}
+
+name_from_file()
+{
+	echo "$1" | sed 's#^.*/##g;s#\..*$##g'
+}
+
+parse_args "$@"
+
+name=$(name_from_file "$outfile")
+
+sed "s/__MODULE_NAME__/$name/g" <"$infile" >"$outfile"
