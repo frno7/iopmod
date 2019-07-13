@@ -1,10 +1,16 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # Define V=1 for more verbose compile.
+# Define S=1 for sanitation checks.
 
 CFLAGS += -Wall -Iinclude
 
 TOOL_CFLAGS += -O2 -g $(CFLAGS) $(BASIC_CFLAGS)
+
+ifeq "$(S)" "1"
+TOOL_CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
+	  -fsanitize-address-use-after-scope -fstack-check
+endif
 
 MODULE_LD := script/iop.ld
 # FIXME: -O0 -> -O2
