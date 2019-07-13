@@ -23,6 +23,7 @@
 
 #include "iopmod/asm/macro.h"
 #include "iopmod/types.h"
+#include "iopmod/version.h"
 
 char progname[] = "iopmod-link";
 
@@ -55,6 +56,7 @@ static void help(FILE *file)
 "\n"
 "options:\n"
 "    -h, --help              display this help and exit\n"
+"    --version               display version and exit\n"
 "    -o, --output <outfile>  name for the IOP module produced by %s\n"
 "\n",
 		progname, progname);
@@ -66,18 +68,27 @@ static void NORETURN help_exit(void)
 	exit(EXIT_SUCCESS);
 }
 
+static void NORETURN version_exit(void)
+{
+	printf("%s version %s\n", progname, program_version());
+
+	exit(EXIT_SUCCESS);
+}
+
 static void parse_options(int argc, char **argv)
 {
 #define OPT(option) (strcmp(options[index].name, (option)) == 0)
 
+	static const struct option options[] = {
+		{ "help",    no_argument,       NULL,          0 },
+		{ "version", no_argument,       NULL,          0 },
+		{ "output",  required_argument, &option.check, 1 },
+		{ NULL, 0, NULL, 0 }
+	};
+
 	argv[0] = progname;	/* For better getopt_long error messages. */
 
 	for (;;) {
-		static const struct option options[] = {
-			{ "help",   no_argument,                NULL, 0 },
-			{ "output", required_argument, &option.check, 1 },
-			{ NULL, 0, NULL, 0 }
-		};
 		int index = 0;
 
 		switch (getopt_long(argc, argv, "o:", options, &index)) {
@@ -90,18 +101,20 @@ static void parse_options(int argc, char **argv)
 			return;
 
 		case 0:
-			if (OPT("output"))
-				option.output = optarg;
-			else if (OPT("help"))
+			if (OPT("help"))
 				help_exit();
-			break;
-
-		case 'o':
-			option.output = optarg;
+			else if (OPT("version"))
+				version_exit();
+			else if (OPT("output"))
+				option.output = optarg;
 			break;
 
 		case 'h':
 			help_exit();
+
+		case 'o':
+			option.output = optarg;
+			break;
 
 		case '?':
 			exit(EXIT_FAILURE);

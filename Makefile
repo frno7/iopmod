@@ -27,6 +27,7 @@ all: module tool
 # Tool
 #
 
+VER := tool/version.c
 IOPMOD_INFO := tool/iopmod-info
 IOPMOD_LINK := tool/iopmod-link
 IOPMOD_SYMC := tool/iopmod-symc
@@ -34,7 +35,7 @@ IOPMOD_MODC := script/iopmod-modc
 
 TOOL_LIB := tool/tool.a
 TOOL_C_SRC := tool/elf32.c tool/file.c tool/irx.c tool/lexc.c		\
-	tool/print.c tool/string.c
+	tool/print.c tool/string.c $(VER)
 TOOL_C_OBJ = $(patsubst %.c, %.o, $(TOOL_C_SRC))
 
 SYMTAB_C_SRC := tool/symtab.c
@@ -70,6 +71,10 @@ $(SYMTAB_C_OBJ): %.o : %.c
 
 $(TOOL_S_OBJ): %.o : %.S
 	$(QUIET_AS)$(CC) $(TOOL_CFLAGS) -c -o $@ $<
+
+.PHONY: $(shell script/version $(VER))
+$(VER):
+	@script/version $@
 
 #
 # Builtin
@@ -158,7 +163,7 @@ check: test
 
 .PHONY: clean
 clean:
-	$(QUIET_RM)$(RM) -f */*.a */*.o */*.o.d				\
+	$(QUIET_RM)$(RM) -f $(VER) */*.a */*.o */*.o.d			\
 		*/*.mod.* */*.sym.* */*.iop */*.irx */*.tmp		\
 		$(IOPMOD_INFO) $(IOPMOD_LINK) $(IOPMOD_SYMC)
 

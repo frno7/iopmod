@@ -26,6 +26,7 @@
 
 #include "iopmod/compare.h"
 #include "iopmod/types.h"
+#include "iopmod/version.h"
 
 char progname[] = "iopmod-symc";
 
@@ -582,6 +583,7 @@ static void help(FILE *file)
 "\n"
 "options:\n"
 "    -h, --help              display this help and exit\n"
+"    --version               display version and exit\n"
 "    -m, --module            generate symbols for a module\n"
 "    -o, --output <outfile>  name for the IOP module produced by %s\n"
 "\n",
@@ -594,19 +596,28 @@ static void NORETURN help_exit(void)
 	exit(EXIT_SUCCESS);
 }
 
+static void NORETURN version_exit(void)
+{
+	printf("%s version %s\n", progname, program_version());
+
+	exit(EXIT_SUCCESS);
+}
+
 static void parse_options(int argc, char **argv)
 {
 #define OPT(option) (strcmp(options[index].name, (option)) == 0)
 
+	static const struct option options[] = {
+		{ "help",    no_argument,       NULL,           0 },
+		{ "version", no_argument,       NULL,           0 },
+		{ "output",  required_argument, &option.check,  1 },
+		{ "module",  no_argument,       &option.module, 1 },
+		{ NULL, 0, NULL, 0 }
+	};
+
 	argv[0] = progname;	/* For better getopt_long error messages. */
 
 	for (;;) {
-		static const struct option options[] = {
-			{ "help",   no_argument,                NULL , 0 },
-			{ "output", required_argument, &option.check,  1 },
-			{ "module", no_argument,       &option.module, 1 },
-			{ NULL, 0, NULL, 0 }
-		};
 		int index = 0;
 
 		switch (getopt_long(argc, argv, "o:m", options, &index)) {
@@ -614,11 +625,16 @@ static void parse_options(int argc, char **argv)
 			return;
 
 		case 0:
-			if (OPT("output"))
-				option.outfile = optarg;
-			else if (OPT("help"))
+			if (OPT("help"))
 				help_exit();
+			else if (OPT("version"))
+				version_exit();
+			else if (OPT("output"))
+				option.outfile = optarg;
 			break;
+
+		case 'h':
+			help_exit();
 
 		case 'o':
 			option.outfile = optarg;
@@ -627,9 +643,6 @@ static void parse_options(int argc, char **argv)
 		case 'm':
 			option.module = 1;
 			break;
-
-		case 'h':
-			help_exit();
 
 		case '?':
 			exit(EXIT_FAILURE);

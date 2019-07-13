@@ -29,6 +29,7 @@
 #include "iopmod/asm/macro.h"
 
 #include "iopmod/types.h"
+#include "iopmod/version.h"
 
 char progname[] = "iopmod-info";
 
@@ -256,6 +257,7 @@ static void help(FILE *file)
 "\n"
 "options:\n"
 "    -h, --help              display this help and exit\n"
+"    --version               display version and exit\n"
 "    --identify              exit sucessfully if the file is an IOP module\n"
 "\n"
 "the following list options can be combined:\n"
@@ -272,10 +274,18 @@ static void NORETURN help_exit(void)
 	exit(EXIT_SUCCESS);
 }
 
+static void NORETURN version_exit(void)
+{
+	printf("%s version %s\n", progname, program_version());
+
+	exit(EXIT_SUCCESS);
+}
+
 static void parse_options(int argc, char **argv)
 {
 	static const struct option options[] = {
 		{ "help",           no_argument, NULL,                   0 },
+		{ "version",        no_argument, NULL,                   0 },
 		{ "identify",       no_argument, &option.identify,       1 },
 		{ "list-modules",   no_argument, &option.list_modules,   1 },
 		{ "list-libraries", no_argument, &option.list_libraries, 1 },
@@ -296,6 +306,8 @@ static void parse_options(int argc, char **argv)
 		case 0:
 			if (OPT("help"))
 				help_exit();
+			else if (OPT("version"))
+				version_exit();
 			break;
 
 		case 'h':
