@@ -557,8 +557,12 @@ static int function_index_cmp(const void *a_, const void *b_)
 
 	return a->index > b->index;
 }
+
 static void order_library(struct library *library, struct module *module)
 {
+	if (!library->function.count)
+		return;
+
 	qsort(library->function.entry, library->function.count,
 		sizeof(*library->function.entry), function_index_cmp);
 }
