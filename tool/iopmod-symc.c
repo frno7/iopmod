@@ -512,6 +512,35 @@ static void write_symtab(const struct symtab *symtab)
 		pr_fatal_errno("stdout: Write failure %d\n", ferror(file));
 }
 
+static void free_function(struct function *function)
+{
+	free(function->alias.entry);
+}
+
+static void free_library(struct library *library)
+{
+	for (size_t i = 0; i < library->function.count; i++)
+		free_function(&library->function.entry[i]);
+
+	free(library->function.entry);
+}
+
+static void free_module(struct module *module)
+{
+	for (size_t i = 0; i < module->library.count; i++)
+		free_library(&module->library.entry[i]);
+
+	free(module->library.entry);
+}
+
+static void free_symtab(struct symtab *symtab)
+{
+	for (size_t i = 0; i < symtab->module.count; i++)
+		free_module(&symtab->module.entry[i]);
+
+	free(symtab->module.entry);
+}
+
 static struct function *function_for_index(int index, struct library *library)
 {
 	for (size_t i = 0; i < library->function.count; i++)
@@ -688,6 +717,8 @@ int main(int argc, char **argv)
 
 	for (int i = optind; i < argc; i++)
 		file_free(file[i - optind]);
+
+	free_symtab(&symtab);
 
 	return EXIT_SUCCESS;
 }
