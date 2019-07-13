@@ -31,7 +31,6 @@
 char progname[] = "iopmod-symc";
 
 static struct {
-	int check;
 	int module;
 
 	const char *outfile;
@@ -584,6 +583,7 @@ static void help(FILE *file)
 "options:\n"
 "    -h, --help              display this help and exit\n"
 "    --version               display version and exit\n"
+"\n"
 "    -m, --module            generate symbols for a module\n"
 "    -o, --output <outfile>  name for the IOP module produced by %s\n"
 "\n",
@@ -610,7 +610,7 @@ static void parse_options(int argc, char **argv)
 	static const struct option options[] = {
 		{ "help",    no_argument,       NULL,           0 },
 		{ "version", no_argument,       NULL,           0 },
-		{ "output",  required_argument, &option.check,  1 },
+		{ "output",  required_argument, NULL,           0 },
 		{ "module",  no_argument,       &option.module, 1 },
 		{ NULL, 0, NULL, 0 }
 	};
@@ -620,7 +620,7 @@ static void parse_options(int argc, char **argv)
 	for (;;) {
 		int index = 0;
 
-		switch (getopt_long(argc, argv, "o:m", options, &index)) {
+		switch (getopt_long(argc, argv, "ho:m", options, &index)) {
 		case -1:
 			return;
 

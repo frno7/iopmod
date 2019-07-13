@@ -28,8 +28,6 @@
 char progname[] = "iopmod-link";
 
 static struct {
-	int check;
-
 	const char *input;
 	const char *output;
 } option;
@@ -57,6 +55,7 @@ static void help(FILE *file)
 "options:\n"
 "    -h, --help              display this help and exit\n"
 "    --version               display version and exit\n"
+"\n"
 "    -o, --output <outfile>  name for the IOP module produced by %s\n"
 "\n",
 		progname, progname);
@@ -80,9 +79,9 @@ static void parse_options(int argc, char **argv)
 #define OPT(option) (strcmp(options[index].name, (option)) == 0)
 
 	static const struct option options[] = {
-		{ "help",    no_argument,       NULL,          0 },
-		{ "version", no_argument,       NULL,          0 },
-		{ "output",  required_argument, &option.check, 1 },
+		{ "help",    no_argument,       NULL, 0 },
+		{ "version", no_argument,       NULL, 0 },
+		{ "output",  required_argument, NULL, 0 },
 		{ NULL, 0, NULL, 0 }
 	};
 
@@ -91,7 +90,7 @@ static void parse_options(int argc, char **argv)
 	for (;;) {
 		int index = 0;
 
-		switch (getopt_long(argc, argv, "o:", options, &index)) {
+		switch (getopt_long(argc, argv, "ho:", options, &index)) {
 		case -1:
 			if (argc < optind + 1)
 				pr_fatal_error("no input file");

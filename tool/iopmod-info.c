@@ -258,6 +258,7 @@ static void help(FILE *file)
 "options:\n"
 "    -h, --help              display this help and exit\n"
 "    --version               display version and exit\n"
+"\n"
 "    --identify              exit sucessfully if the file is an IOP module\n"
 "\n"
 "the following list options can be combined:\n"
