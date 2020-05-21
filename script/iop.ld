@@ -56,6 +56,7 @@ SECTIONS
 		*(.gnu.attributes)
 		*(.mdebug.*)
 		*(.MIPS.*)
+		*(.note.*)
 		*(.pdr)
 		*(.reginfo)
 		*(.rel.dyn)
