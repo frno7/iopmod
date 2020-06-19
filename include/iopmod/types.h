@@ -7,6 +7,18 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define __BITFIELD_FIELD(field, more)					\
+	field;								\
+	more
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define __BITFIELD_FIELD(field, more)					\
+	more								\
+	field;
+#else
+#error "bitfield neither big nor little endian?"
+#endif
+
 typedef int8_t __s8;
 typedef int16_t __s16;
 typedef int32_t __s32;
