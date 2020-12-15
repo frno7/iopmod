@@ -113,7 +113,7 @@ id_(14) int thevent_irefer_event_flag_status(int ef, struct iop_event_status* st
 
 LIBRARY_ID(thsemap, 0x0101);
 
-id_(4) int thsemap_create_sema(struct iop_sema *sema)
+id_(4) int thsemap_create_sema(const struct iop_sema *sema)
 	alias_(CreateSema);
 id_(5) int thsemap_delete_sema(int semid)
 	alias_(DeleteSema);
