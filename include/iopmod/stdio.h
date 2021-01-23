@@ -9,4 +9,6 @@
 
 int vsnprintf(char *str, size_t size, const char *format, va_list ap);
 
+int printf(const char *format, ...);	/* Alias for stdio_printf */
+
 #endif /* IOPMOD_STDIO_H */
