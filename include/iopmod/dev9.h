@@ -3,6 +3,9 @@
 #ifndef IOPMOD_DEV9_H
 #define IOPMOD_DEV9_H
 
+#include "iopmod/module-prototype.h"
+#include "iopmod/module/dev9.h"
+
 #define SSBUS_REG_1418 0xbf801418
 #define SSBUS_REG_141c 0xbf80141c
 #define SSBUS_REG_1420 0xbf801420
