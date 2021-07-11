@@ -31,7 +31,7 @@ enum {
 	IRQ_IOP_ILINK,
 	IRQ_IOP_ILNKDMA,
 
-	IRQ_IOP_DMA_MDEC_IN = 0x20,	/* Ch0 */
+	IRQ_IOP_DMA_MDEC_IN = 32,	/* Ch0 */
 	IRQ_IOP_DMA_MDEC_OUT,		/* Ch1 */
 	IRQ_IOP_DMA_SIF2,		/* Ch2 */
 	IRQ_IOP_DMA_CDVD,		/* Ch3 */
@@ -46,7 +46,18 @@ enum {
 	IRQ_IOP_DMA_SIO2_IN,		/* Ch11 */
 	IRQ_IOP_DMA_SIO2_OUT,		/* Ch12 */
 
-	IRQ_IOP_SW1 = 0x3E,		/* R3000A software interrupt 1 */
+	IRQ_IOP_SPD       = 46,
+	IRQ_IOP_SPD_ATA0  = 46,
+	IRQ_IOP_SPD_ATA1  = 47,
+	IRQ_IOP_SPD_TXDNV = 48,
+	IRQ_IOP_SPD_RXDNV = 49,
+	IRQ_IOP_SPD_TXEND = 50,
+	IRQ_IOP_SPD_RXEND = 51,
+	IRQ_IOP_SPD_EMAC3 = 52,
+	IRQ_IOP_SPD_DVR   = 55,
+	IRQ_IOP_SPD_UART  = 58,
+
+	IRQ_IOP_SW1 = 62,		/* R3000A software interrupt 1 */
 	IRQ_IOP_SW2,			/* R3000A software interrupt 2 */
 };
 
