@@ -5,6 +5,7 @@
 
 #include "iopmod/module-prototype.h"
 #include "iopmod/module/intrman.h"
+#include "iopmod/module/irq.h"
 
 #include "iopmod/typecheck.h"
 
@@ -23,9 +24,9 @@
 		intrman_cpu_resume_irq(flags);				\
 	} while (0)
 
-int request_irq(unsigned int irq, irq_handler_t cb, void *arg);
+int request_irq__(unsigned int irq, irq_handler_t cb, void *arg);
 
-int release_irq(unsigned int irq);
+int release_irq__(unsigned int irq);
 
 /**
  * in_irq - are we in IRQ context?

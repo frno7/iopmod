@@ -7,7 +7,7 @@
 #include "iopmod/iop-error.h"
 #include "iopmod/types.h"
 
-int request_irq(unsigned int irq, irq_handler_t cb, void *arg)
+int request_irq__(unsigned int irq, irq_handler_t cb, void *arg)
 {
 	unsigned int mode = 1;	/* FIXME: Mode? */
 	int ioperr;
@@ -21,7 +21,7 @@ int request_irq(unsigned int irq, irq_handler_t cb, void *arg)
 	return 0;
 }
 
-int release_irq(unsigned int irq)
+int release_irq__(unsigned int irq)
 {
 	int ioperr;
 
