@@ -61,6 +61,25 @@ enum {
 	IRQ_IOP_SW2,			/* R3000A software interrupt 2 */
 };
 
+/**
+ * irq_mode - mode of registers saved and restored during an interrupt
+ * @IRQ_MODE_SOME: $at, $v0, $v1, $a0, $a1, $a2, $a3, $sp and $ra
+ * @IRQ_MODE_MORE: like @IRQ_MODE_SOME with $t0..$t9, $gp and $fp
+ * @IRQ_MODE_MOST: like @IRQ_MODE_MORE with $s0..$s7
+ *
+ * Additionally note that $hi, $lo, $t0..$t9 normally are caller saved, and
+ * that $s0..$s8 normally are callee saved, by normal calling conventions.
+ *
+ * Finally, $k0 and $k1 are reserved for use by interrupt handlers, and can
+ * randomly change at any time, unless all interrupts are disabled by for
+ * instance irq_save().
+ */
+enum irq_mode {
+	IRQ_MODE_SOME = 0,
+	IRQ_MODE_MORE = 1,
+	IRQ_MODE_MOST = 2,
+};
+
 /** FIXME */
 enum irq_status {
 	IRQ_HANDLED = 1,

@@ -4,7 +4,7 @@ MODULE_ID(Interrupt_Manager, 0x0102);
 LIBRARY_ID(intrman, 0x0102);
 
 id_(4) enum irq_status intrman_request_irq(unsigned int irq,
-		int mode, irq_handler_t handler, void *arg)
+		enum irq_mode mode, irq_handler_t handler, void *arg)
 	alias_(RegisterIntrHandler);
 id_(5) int intrman_release_irq(unsigned int irq)
 	alias_(ReleaseIntrHandler);

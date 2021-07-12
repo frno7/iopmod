@@ -9,10 +9,9 @@
 
 int request_irq__(unsigned int irq, irq_handler_t cb, void *arg)
 {
-	unsigned int mode = 1;	/* FIXME: Mode? */
 	int ioperr;
 
-	ioperr = intrman_request_irq(irq, mode, cb, arg);
+	ioperr = intrman_request_irq(irq, IRQ_MODE_MORE, cb, arg);
 	if (ioperr < 0)
 		return errno_for_iop_error(ioperr);
 
