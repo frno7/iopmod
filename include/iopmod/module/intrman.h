@@ -9,9 +9,10 @@ id_(4) enum irq_status intrman_request_irq(unsigned int irq,
 id_(5) int intrman_release_irq(unsigned int irq)
 	alias_(ReleaseIntrHandler);
 
-id_(6) void intrman_enable_irq(unsigned int irq)
+id_(6) int intrman_enable_irq(unsigned int irq)
 	alias_(EnableIntr);
-id_(7) void intrman_disable_irq(unsigned int irq, int *res)
+
+id_(7) int intrman_disable_irq(unsigned int irq, int *res)
 	alias_(DisableIntr);
 
 id_(8) int intrman_cpu_disable_irqs(void)
