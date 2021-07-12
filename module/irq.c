@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * IRQ module.
+ * Main IRQ module. This is the interrupt controller drivers and almost any
+ * other module should use. It cascades multiple hardware controllers
+ * including DEV9 SPD IRQs by assigning virtual IRQs for them, which unifies
+ * and simplifies IRQ handling.
+ *
+ * The available IRQs are defined in <include/iopmod/irqs.h>.
  *
  * Copyright (C) 2021 Fredrik Noring
  */

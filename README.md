@@ -8,7 +8,10 @@ A `mipsr5900el-unknown-linux-gnu` target GCC cross-compiler is recommended, with
 
 ## Modules
 
-Currently two modules are implemented: [printk](module/printk.c) and [irqrelay](module/irqrelay.c).
+Currently three modules are implemented:
+[irq](module/irq.c),
+[irqrelay](module/irqrelay.c) and
+[printk](module/printk.c).
 
 ## Tools
 
