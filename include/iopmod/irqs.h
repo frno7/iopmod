@@ -52,4 +52,11 @@ enum {
 	IOP_IRQ_COUNT = 42
 };
 
+/** FIXME */
+enum irq_status {
+	IRQ_HANDLED = 1,
+};
+
+typedef enum irq_status (*irq_handler_t)(void *arg);
+
 #endif /* IOPMOD_IRQS_H */

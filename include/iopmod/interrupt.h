@@ -3,6 +3,8 @@
 #ifndef IOPMOD_INTERRUPT_H
 #define IOPMOD_INTERRUPT_H
 
+#include "iopmod/irqs.h"
+
 #include "iopmod/module-prototype.h"
 #include "iopmod/module/intrman.h"
 #include "iopmod/module/irq.h"

@@ -3,13 +3,6 @@
 MODULE_ID(Interrupt_Manager, 0x0102);
 LIBRARY_ID(intrman, 0x0102);
 
-/** FIXME */
-enum irq_status {
-	IRQ_HANDLED = 1,
-};
-
-typedef enum irq_status (*irq_handler_t)(void *arg);
-
 id_(4) enum irq_status intrman_request_irq(unsigned int irq,
 		int mode, irq_handler_t handler, void *arg)
 	alias_(RegisterIntrHandler);
