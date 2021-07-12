@@ -45,6 +45,8 @@ static struct {
 	int list_libraries;
 	int list_functions;
 
+	int alias;
+
 	const char *filepath;
 } option;
 
@@ -88,13 +90,19 @@ static void show_import_links(
 		const int link_id = irx_id_for_import_link(link);
 		const struct module_func_symbol *decl =
 			func_symbol_from_index(library->name, link_id);
+		const struct module_func_symbol *decl_alias =
+			func_first_alias_from_index(library->name, link_id);
 		const Elf_Addr link_addr = elf_addr_for_ent(link, ehdr);
 		const char *name = elf_symbol_for_addr(link_addr, ehdr);
 
 		if (name && decl && strcmp(name, decl->function.name) == 0)
 			name = NULL;	/* Duplicate */
+		if (name && decl_alias && strcmp(name, decl_alias->function.name) == 0)
+			name = NULL;	/* Duplicate */
 
-		const char *s0 = decl ? decl->function.name : NULL;
+		const char *s0 = option.alias ?
+			(decl_alias ? decl_alias->function.name : NULL) :
+			(decl ? decl->function.name : NULL) ;
 		const char *s1 = name;
 
 		pr_info("import %2d\t%2d%s%s%s%s",
@@ -129,10 +137,18 @@ static void show_export_links(
 	irx_for_each_export_link (link, library) {
 		const struct module_func_symbol *decl =
 			func_symbol_from_index(library->name, i);
+		const struct module_func_symbol *decl_alias =
+			func_first_alias_from_index(library->name, i);
 		const char *name = "";
 
-		if (decl)
+		if (decl && !option.alias)
 			name = decl->function.name;
+		else if (decl_alias && option.alias)
+			name = decl_alias->function.name;
+		else if (decl)
+			name = decl->function.name;
+		else if (decl_alias)
+			name = decl_alias->function.name;
 		else if (link->offset == iopmod->entry_addr)
 			name = "_init_module";
 		else
@@ -267,6 +283,8 @@ static void help(FILE *file)
 "\n"
 "    --identify              exit sucessfully if the file is an IOP module\n"
 "\n"
+"    --alias                 display symbol aliases rather than declarations\n"
+"\n"
 "the following list options can be combined:\n"
 "    --list-modules          list recognised IOP modules and exit\n"
 "    --list-libraries        list recognised IOP libraries and exit\n"
@@ -294,6 +312,7 @@ static void parse_options(int argc, char **argv)
 		{ "help",           no_argument, NULL,                   0 },
 		{ "version",        no_argument, NULL,                   0 },
 		{ "identify",       no_argument, &option.identify,       1 },
+		{ "alias",          no_argument, &option.alias,        1 },
 		{ "list-modules",   no_argument, &option.list_modules,   1 },
 		{ "list-libraries", no_argument, &option.list_libraries, 1 },
 		{ "list-functions", no_argument, &option.list_functions, 1 },

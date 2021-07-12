@@ -26,26 +26,30 @@ iopmod id name		printk
 iopmod id version	0x0100
 iopmod entry addr	0x0
 iopmod unknown addr	0x22d0
-iopmod text size	8332
+iopmod text size	8336
 iopmod data size	0
 iopmod bss size		0
 iopmod version		0x0100
 iopmod name		printk
 import library	0x0102	intrman
-import  0	23	QueryIntrContext	intrman_in_irq
+import  0	23	intrman_in_irq
 import library	0x0101	loadcore
 import  0	 6	loadcore_register_library
 import library	0x0101	loadcore
 import  0	 7	loadcore_release_library
 import library	0x0101	sifcmd
-import  0	12	sifcmd_send_cmd	sifcmd_send_cmd
+import  0	12	sifcmd_send_cmd
 import library	0x0101	sifcmd
-import  0	13	isceSifSendCmd	sifcmd_send_cmd_irq
+import  0	13	sifcmd_send_cmd_irq
 import library	0x0101	sifman
-import  0	 8	sceSifDmaStat	__sifman_dma_stat
+import  0	 8	__sifman_dma_stat
 export library	0x0100	printk
 export  0	0x00b4	printk
 ```
+
+The `--alias` option can be given to display symbols familiar from
+[PS2SDK](https://github.com/ps2dev/ps2sdk/). In the example above,
+`intrman_in_irq` would be displayed as `QueryIntrContext`.
 
 `iopmod-info` can also list modules, libraries and functions including versions that are compiled into the tool. For example:
 
