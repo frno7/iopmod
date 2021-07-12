@@ -53,6 +53,10 @@ struct module_func_symbol {
 const struct module_func_symbol *func_symbol_from_index(
 	const char *library, const int index);
 
+/** FIXME */
+const struct module_func_symbol *func_first_alias_from_index(
+	const char *name, const int index);
+
 #define symtab_for_each_symbol(symbol)					\
 	for ((symbol) = symtab_first_symbol();				\
 	     (symbol)->module.name;					\

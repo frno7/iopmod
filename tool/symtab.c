@@ -385,3 +385,19 @@ const struct module_func_symbol *func_symbol_from_index(
 
 	return NULL;
 }
+
+const struct module_func_symbol *func_first_alias_from_index(
+	const char *name, const int index)
+{
+	const struct symtab_library *library = symtab_library_for_name(name);
+	const struct symtab_function *function;
+	const struct symtab_function *alias;
+
+	if (library)
+		symtab_for_each_library_function (function, library)
+			if (function->index == index)
+				symtab_for_each_function_alias(alias, function)
+					return symtab_symbol_for_function(alias);
+
+	return NULL;
+}
