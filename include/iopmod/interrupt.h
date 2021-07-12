@@ -25,14 +25,14 @@
 		intrman_cpu_resume_irq(flags);				\
 	} while (0)
 
-static inline int enable_irq__(unsigned int irq)
+static inline void enable_irq__(unsigned int irq)
 {
-	return intrman_enable_irq(irq);
+	intrman_enable_irq(irq);
 }
 
-static inline int disable_irq__(unsigned int irq)
+static inline void disable_irq__(unsigned int irq)
 {
-	return intrman_disable_irq(irq, NULL);	/* FIXME: What does NULL mean here? */
+	intrman_disable_irq(irq, NULL);	/* FIXME: What does NULL mean here? */
 }
 
 int request_irq__(unsigned int irq, irq_handler_t cb, void *arg);
