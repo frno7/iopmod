@@ -171,7 +171,16 @@ check: test
 clean:
 	$(QUIET_RM)$(RM) -f $(VER) */*.a */*.o */*.o.d			\
 		*/*.mod.* */*.sym.* */*.iop */*.irx */*.tmp		\
-		$(IOPMOD_INFO) $(IOPMOD_LINK) $(IOPMOD_SYMC)
+		$(IOPMOD_INFO) $(IOPMOD_LINK) $(IOPMOD_SYMC)		\
+		GPATH GRTAGS GTAGS
+
+#
+# Global tags
+#
+
+.PHONY: gtags
+gtags:
+	$(QUIET_GEN)gtags
 
 #
 # General

@@ -6,3 +6,6 @@
 *.o.d
 *.sym.*
 *.result
+/GPATH
+/GRTAGS
+/GTAGS
