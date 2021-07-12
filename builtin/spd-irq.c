@@ -20,12 +20,12 @@
 
 static int spd_irq_count;
 
-#define SPD_IRQ_TYPE(irq_) [irq_ - IRQ_IOP_SPD] = { }
+#define SPD_IRQ_TYPE(irq_) [irq_ - IRQ_IOP_SPD_BASE] = { }
 
 static struct spd_irq_desc {
 	irq_handler_t cb;
 	void *arg;
-} spd_irqs[16] = {
+} spd_irqs[IRQ_IOP_SPD_LAST - IRQ_IOP_SPD_BASE + 1] = {
 	SPD_IRQ_TYPE(IRQ_IOP_SPD_ATA0),
 	SPD_IRQ_TYPE(IRQ_IOP_SPD_ATA1),
 	SPD_IRQ_TYPE(IRQ_IOP_SPD_TXDNV),
@@ -40,7 +40,7 @@ static struct spd_irq_desc {
 static struct spd_irq_desc *spd_irq(unsigned int irq)
 {
 	if (spd_valid_irq(irq))
-		return &spd_irqs[irq - IRQ_IOP_SPD];
+		return &spd_irqs[irq - IRQ_IOP_SPD_BASE];
 
 	pr_warn("IRQ %d not SPD\n", irq);
 
@@ -49,21 +49,21 @@ static struct spd_irq_desc *spd_irq(unsigned int irq)
 
 static void spd_ack_irq____(unsigned int irq)
 {
-	const u16 m = BIT(irq - IRQ_IOP_SPD);
+	const u16 m = BIT(irq - IRQ_IOP_SPD_BASE);
 
 	iowr16(m, SPD_REG(SPD_REG_INTR_STAT));
 }
 
 static void spd_enable_irq____(unsigned int irq)
 {
-	const u16 m = BIT(irq - IRQ_IOP_SPD);
+	const u16 m = BIT(irq - IRQ_IOP_SPD_BASE);
 
 	iowr16(iord16(SPD_REG(SPD_REG_INTR_MASK)) | m, SPD_REG(SPD_REG_INTR_MASK));
 }
 
 static void spd_disable_irq____(unsigned int irq)
 {
-	const u16 m = BIT(irq - IRQ_IOP_SPD);
+	const u16 m = BIT(irq - IRQ_IOP_SPD_BASE);
 
 	iowr16(iord16(SPD_REG(SPD_REG_INTR_MASK)) & ~m, SPD_REG(SPD_REG_INTR_MASK));
 }

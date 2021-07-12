@@ -13,7 +13,7 @@
  */
 static inline bool spd_valid_irq(unsigned int irq)
 {
-	return IRQ_IOP_SPD <= irq && irq <= IRQ_IOP_SPD_UART;
+	return IRQ_IOP_SPD_BASE <= irq && irq <= IRQ_IOP_SPD_LAST;
 }
 
 int spd_request_irq__(unsigned int irq, irq_handler_t cb, void *arg);
