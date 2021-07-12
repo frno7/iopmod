@@ -10,6 +10,8 @@
 #include "iopmod/module.h"
 
 struct intc {
+	int (*enable_irq)(unsigned int irq);
+	int (*disable_irq)(unsigned int irq);
 	int (*request_irq)(unsigned int irq, irq_handler_t cb, void *arg);
 	int (*release_irq)(unsigned int irq);
 };
@@ -17,11 +19,23 @@ struct intc {
 static const struct intc *intc(unsigned int irq)
 {
 	static const struct intc intrman = {
+		.enable_irq = enable_irq__,
+		.disable_irq = disable_irq__,
 		.request_irq = request_irq__,
 		.release_irq = release_irq__,
 	};
 
 	return &intrman;	/* Default to intrman interrupt controller. */
+}
+
+int enable_irq(unsigned int irq)
+{
+	return intc(irq)->enable_irq(irq);
+}
+
+int disable_irq(unsigned int irq)
+{
+	return intc(irq)->disable_irq(irq);
 }
 
 int request_irq(unsigned int irq, irq_handler_t cb, void *arg)
