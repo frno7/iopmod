@@ -3,6 +3,8 @@
 #ifndef IOPMOD_INTERRUPT_H
 #define IOPMOD_INTERRUPT_H
 
+#include <stddef.h>
+
 #include "iopmod/irqs.h"
 
 #include "iopmod/module-prototype.h"
@@ -10,9 +12,6 @@
 #include "iopmod/module/irq.h"
 
 #include "iopmod/typecheck.h"
-
-#define enable_irq(irq) intrman_enable_irq(irq)
-#define disable_irq(irq) intrman_disable_irq(irq, NULL)	/* FIXME: What does NULL mean here? */
 
 #define irq_save(flags)							\
 	do {								\
@@ -25,6 +24,16 @@
 		typecheck(unsigned int, flags);				\
 		intrman_cpu_resume_irq(flags);				\
 	} while (0)
+
+static inline int enable_irq(unsigned int irq)
+{
+	return intrman_enable_irq(irq);
+}
+
+static inline int disable_irq(unsigned int irq)
+{
+	return intrman_disable_irq(irq, NULL);	/* FIXME: What does NULL mean here? */
+}
 
 int request_irq__(unsigned int irq, irq_handler_t cb, void *arg);
 
