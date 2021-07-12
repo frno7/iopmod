@@ -8,6 +8,7 @@
 #include "iopmod/interrupt.h"
 #include "iopmod/irq.h"
 #include "iopmod/module.h"
+#include "iopmod/spd-irq.h"
 
 struct intc {
 	void (*enable_irq)(unsigned int irq);
@@ -24,6 +25,16 @@ static const struct intc *intc(unsigned int irq)
 		.request_irq = request_irq__,
 		.release_irq = release_irq__,
 	};
+
+	static const struct intc spd = {
+		.enable_irq = spd_enable_irq__,
+		.disable_irq = spd_disable_irq__,
+		.request_irq = spd_request_irq__,
+		.release_irq = spd_release_irq__,
+	};
+
+	if (spd_valid_irq(irq))
+		return &spd;
 
 	return &intrman;	/* Default to intrman interrupt controller. */
 }
