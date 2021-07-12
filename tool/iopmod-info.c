@@ -91,7 +91,8 @@ static void show_import_links(
 		const Elf_Addr link_addr = elf_addr_for_ent(link, ehdr);
 		const char *name = elf_symbol_for_addr(link_addr, ehdr);
 
-		/* FIXME: Deduplication of names */
+		if (name && decl && strcmp(name, decl->function.name) == 0)
+			name = NULL;	/* Duplicate */
 
 		pr_info("import %2d\t%2d\t%s\t%s",
 			i++,
