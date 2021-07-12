@@ -94,11 +94,16 @@ static void show_import_links(
 		if (name && decl && strcmp(name, decl->function.name) == 0)
 			name = NULL;	/* Duplicate */
 
-		pr_info("import %2d\t%2d\t%s\t%s",
+		const char *s0 = name;
+		const char *s1 = decl ? decl->function.name : NULL;
+
+		pr_info("import %2d\t%2d%s%s%s%s",
 			i++,
 			link_id,
-			name ? name : "",
-			decl ? decl->function.name : "");
+			s0 ? "\t" : "",
+			s0 ? s0 : "",
+			s1 ? "\t" : "",
+			s1 ? s1 : "");
 	}
 }
 
