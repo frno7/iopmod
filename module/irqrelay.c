@@ -16,6 +16,10 @@
 #include "iopmod/sifman.h"
 #include "iopmod/thread.h"
 
+#include "iopmod/asm/macro.h"
+
+#define MAX_IRQ_RELAYS 16
+
 /**
  * enum iop_irq_relay_rpc_ops - IOP IRQ relay RPC operations
  * @rpo_request_irq: request IRQ mapping
@@ -62,7 +66,7 @@ struct iop_irq_map {
 	u16 rpc : 1;
 };
 
-static struct iop_irq_map irqs[IOP_IRQ_COUNT];
+static struct iop_irq_map irqs[MAX_IRQ_RELAYS];
 
 static int rpc_stid;
 static struct sifcmd_rpc_data_queue rpc_qdata;
@@ -90,7 +94,7 @@ static enum irq_status service_irq(void *arg)
 
 static struct iop_irq_map *find_map(unsigned int iop_irq)
 {
-	for (int i = 0; i < IOP_IRQ_COUNT; i++)
+	for (int i = 0; i < ARRAY_SIZE(irqs); i++)
 		if (irqs[i].set && irqs[i].iop == iop_irq)
 			return &irqs[i];
 
@@ -99,7 +103,7 @@ static struct iop_irq_map *find_map(unsigned int iop_irq)
 
 static struct iop_irq_map *find_unset(unsigned int iop_irq)
 {
-	for (int i = 0; i < IOP_IRQ_COUNT; i++)
+	for (int i = 0; i < ARRAY_SIZE(irqs); i++)
 		if (!irqs[i].set)
 			return &irqs[i];
 

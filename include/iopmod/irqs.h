@@ -48,8 +48,6 @@ enum {
 
 	IRQ_IOP_SW1 = 0x3E,		/* R3000A software interrupt 1 */
 	IRQ_IOP_SW2,			/* R3000A software interrupt 2 */
-
-	IOP_IRQ_COUNT = 42
 };
 
 /** FIXME */
