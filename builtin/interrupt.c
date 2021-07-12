@@ -7,6 +7,18 @@
 #include "iopmod/iop-error.h"
 #include "iopmod/types.h"
 
+/**
+ * request_irq__ - allocate an intrman interrupt line and enable it
+ * @irq: interrupt line to allocate
+ * @cb: function to be called back when the IRQ occurs
+ * @arg: optional argument passed back to the callback function, can be %NULL
+ *
+ * Drivers should use request_irq() instead. This function is used by the main
+ * interrupt controller.
+ *
+ * Context: thread
+ * Return: 0 on success, negative errno on error
+ */
 int request_irq__(unsigned int irq, irq_handler_t cb, void *arg)
 {
 	int ioperr;
@@ -20,6 +32,16 @@ int request_irq__(unsigned int irq, irq_handler_t cb, void *arg)
 	return 0;
 }
 
+/**
+ * release_irq__ - disable and free an allocated intrman interrupt
+ * @irq: interrupt line to release
+ *
+ * Drivers should use release_irq() instead. This function is used by the main
+ * interrupt controller.
+ *
+ * Context: thread
+ * Return: 0 on success, negative errno on error
+ */
 int release_irq__(unsigned int irq)
 {
 	int ioperr;

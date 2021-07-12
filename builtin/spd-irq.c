@@ -68,34 +68,6 @@ static void spd_disable_irq____(unsigned int irq)
 	iowr16(iord16(SPD_REG(SPD_REG_INTR_MASK)) & ~m, SPD_REG(SPD_REG_INTR_MASK));
 }
 
-void spd_enable_irq__(unsigned int irq)
-{
-	unsigned int flags;
-
-	if (!spd_valid_irq(irq))
-		return;
-
-	irq_save(flags);
-
-	spd_enable_irq____(irq);
-
-	irq_restore(flags);
-}
-
-void spd_disable_irq__(unsigned int irq)
-{
-	unsigned int flags;
-
-	if (!spd_valid_irq(irq))
-		return;
-
-	irq_save(flags);
-
-	spd_disable_irq____(irq);
-
-	irq_restore(flags);
-}
-
 static enum irq_status spd_handle_irq(void *arg)
 {
 	u16 pending = iord16(SPD_REG(SPD_REG_INTR_STAT)) &
@@ -115,6 +87,18 @@ static enum irq_status spd_handle_irq(void *arg)
 	return IRQ_HANDLED;
 }
 
+/**
+ * spd_request_irq__ - allocate a DEV9 SPD interrupt line and enable it
+ * @irq: interrupt line to allocate
+ * @cb: function to be called back when the IRQ occurs
+ * @arg: optional argument passed back to the callback function, can be %NULL
+ *
+ * Drivers should use request_irq() instead. This function is used by the main
+ * interrupt controller.
+ *
+ * Context: thread
+ * Return: 0 on success, negative errno on error
+ */
 int spd_request_irq__(unsigned int irq, irq_handler_t cb, void *arg)
 {
 	struct spd_irq_desc *desc = spd_irq(irq);
@@ -144,6 +128,16 @@ int spd_request_irq__(unsigned int irq, irq_handler_t cb, void *arg)
 	return ioperr < 0 ? errno_for_iop_error(ioperr) : 0;
 }
 
+/**
+ * spd_release_irq__ - disable and free an allocated DEV9 SPD interrupt
+ * @irq: interrupt line to release
+ *
+ * Drivers should use release_irq() instead. This function is used by the main
+ * interrupt controller.
+ *
+ * Context: thread
+ * Return: 0 on success, negative errno on error
+ */
 int spd_release_irq__(unsigned int irq)
 {
 	struct spd_irq_desc *desc = spd_irq(irq);
@@ -169,4 +163,58 @@ int spd_release_irq__(unsigned int irq)
 	irq_restore(flags);
 
 	return ioperr < 0 ? errno_for_iop_error(ioperr) : 0;
+}
+
+/**
+ * spd_enable_irq__ - enable handling of the selected DEV9 SPD interrupt line
+ * @irq: interrupt to enable
+ *
+ * Drivers should use enable_irq() instead. This function is used by the main
+ * interrupt controller.
+ *
+ * Note that spd_enable_irq__() and spd_disable_irq__() do not nest, so
+ * spd_enable_irq__() will enable regardless of the number of previous calls
+ * to spd_disable_irq__().
+ *
+ * Context: any
+ */
+void spd_enable_irq__(unsigned int irq)
+{
+	unsigned int flags;
+
+	if (!spd_valid_irq(irq))
+		return;
+
+	irq_save(flags);
+
+	spd_enable_irq____(irq);
+
+	irq_restore(flags);
+}
+
+/**
+ * spd_disable_irq__ - disable the selected DEV9 SPD interrupt line
+ * @irq: interrupt to disable
+ *
+ * Drivers should use disable_irq() instead. This function is used by the main
+ * interrupt controller.
+ *
+ * Note that spd_enable_irq__() and spd_disable_irq__() do not nest, so
+ * spd_enable_irq__() will enable regardless of the number of previous calls
+ * to spd_disable_irq__().
+ *
+ * Context: any
+ */
+void spd_disable_irq__(unsigned int irq)
+{
+	unsigned int flags;
+
+	if (!spd_valid_irq(irq))
+		return;
+
+	irq_save(flags);
+
+	spd_disable_irq____(irq);
+
+	irq_restore(flags);
 }

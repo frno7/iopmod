@@ -39,21 +39,55 @@ static const struct intc *intc(unsigned int irq)
 	return &intrman;	/* Default to intrman interrupt controller. */
 }
 
+/**
+ * enable_irq - enable handling of the selected interrupt line
+ * @irq: interrupt to enable
+ *
+ * Note that enable_irq() and disable_irq() do not nest, so enable_irq() will
+ * enable regardless of the number of previous calls to disable_irq().
+ *
+ * Context: any
+ */
 void enable_irq(unsigned int irq)
 {
 	intc(irq)->enable_irq(irq);
 }
 
+/**
+ * disable_irq - disable the selected interrupt line
+ * @irq: interrupt to disable
+ *
+ * Note that enable_irq() and disable_irq() do not nest, so enable_irq() will
+ * enable regardless of the number of previous calls to disable_irq().
+ *
+ * Context: any
+ */
 void disable_irq(unsigned int irq)
 {
 	intc(irq)->disable_irq(irq);
 }
 
+/**
+ * request_irq - allocate an interrupt line and enable it
+ * @irq: interrupt line to allocate
+ * @cb: function to be called back when the IRQ occurs
+ * @arg: optional argument passed back to the callback function, can be %NULL
+ *
+ * Context: thread
+ * Return: 0 on success, negative errno on error
+ */
 int request_irq(unsigned int irq, irq_handler_t cb, void *arg)
 {
 	return intc(irq)->request_irq(irq, cb, arg);
 }
 
+/**
+ * release_irq - disable and free an allocated interrupt
+ * @irq: interrupt line to release
+ *
+ * Context: thread
+ * Return: 0 on success, negative errno on error
+ */
 int release_irq(unsigned int irq)
 {
 	return intc(irq)->release_irq(irq);
