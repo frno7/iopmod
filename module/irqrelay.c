@@ -8,7 +8,7 @@
 #include "iopmod/errno.h"
 #include "iopmod/interrupt.h"
 #include "iopmod/iop-error.h"
-#include "iopmod/irq.h"
+#include "iopmod/irqs.h"
 #include "iopmod/module.h"
 #include "iopmod/printk.h"
 #include "iopmod/sif.h"

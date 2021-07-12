@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
-#ifndef IOPMOD_IRQ_H
-#define IOPMOD_IRQ_H
+#ifndef IOPMOD_IRQS_H
+#define IOPMOD_IRQS_H
 
 enum {
 	IRQ_IOP_VBLANK = 0,
@@ -52,4 +52,4 @@ enum {
 	IOP_IRQ_COUNT = 42
 };
 
-#endif /* IOPMOD_IRQ_H */
+#endif /* IOPMOD_IRQS_H */
