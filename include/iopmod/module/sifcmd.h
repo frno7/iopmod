@@ -17,11 +17,21 @@ id_(8) void sifcmd_set_cmd_buffer(
 id_(9) void sifcmd_set_sys_cmd_buffer(
 		struct sifcmd_handler_data *sysCmdBuffer, int size)
 	alias_(sceSifSetSysCmdBuffer);
-id_(10) void sifcmd_add_cmd_handler(
-		int cid, sifcmd_handler handler, void *harg)
+
+/**
+ * sif_request_cmd - register SIF command
+ * @cid: command id, normally limited to 0..31, with bit 31 indicating system
+ * @handler: function to be called back for the command
+ * @arg: optional argument passed back to the callback function, can be %NULL
+ */
+id_(10) void sif_request_cmd(int cid, sifcmd_handler handler, void *arg)
 	alias_(sceSifAddCmdHandler);
 
-id_(11) void sifcmd_remove_cmd_handler(int cid)
+/**
+ * sif_release_cmd - deregister SIF command
+ * @cid: command id, normally limited to 0..31, with bit 31 indicating system
+ */
+id_(11) void sif_release_cmd(int cid)
 	alias_(sceSifRemoveCmdHandler);
 
 /**

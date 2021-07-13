@@ -63,7 +63,7 @@ enum {
 };
 
 /**
- * irq_mode - mode of registers saved and restored during an interrupt
+ * enum irq_mode - mode of registers saved and restored during an interrupt
  * @IRQ_MODE_SOME: $at, $v0, $v1, $a0, $a1, $a2, $a3, $sp and $ra
  * @IRQ_MODE_MORE: like @IRQ_MODE_SOME with $t0..$t9, $gp and $fp
  * @IRQ_MODE_MOST: like @IRQ_MODE_MORE with $s0..$s7
@@ -81,11 +81,20 @@ enum irq_mode {
 	IRQ_MODE_MOST = 2,
 };
 
-/** FIXME */
+/**
+ * enum irq_status - FIXME
+ * @IRQ_HANDLED: FIXME
+ */
 enum irq_status {
 	IRQ_HANDLED = 1,
 };
 
+/**
+ * typedef irq_handler_t - FIXME
+ * @arg: FIXME
+ *
+ * Return: FIXME
+ */
 typedef enum irq_status (*irq_handler_t)(void *arg);
 
 #endif /* IOPMOD_IRQS_H */

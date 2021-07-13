@@ -63,11 +63,18 @@ struct sifcmd_sreg_data {
 	unsigned int value;
 };
 
-typedef void (*sifcmd_handler)(void *data, void *harg);
+/**
+ * typedef sifcmd_handler - SIF command handler
+ * @header: SIF command header
+ * @arg: argument passed to sif_request_cmd()
+ *
+ * FIXME: Why is @header->packet_size always zero?
+ */
+typedef void (*sifcmd_handler)(const struct sif_cmd_header *header, void *arg);
 
 struct sifcmd_handler_data {
 	sifcmd_handler handler;
-	void *harg;
+	void *arg;
 };
 
 typedef void *(*sifcmd_rpc_func)(int rpo, void *buffer, size_t size);
