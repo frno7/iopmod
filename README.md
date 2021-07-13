@@ -4,7 +4,8 @@ The [input/output processor (IOP)](https://en.wikipedia.org/wiki/PlayStation_2_t
 
 ## Building
 
-A `mipsr5900el-unknown-linux-gnu` target GCC cross-compiler is recommended, with for example the command `make CROSS_COMPILE=mipsr5900el-unknown-linux-gnu-`.
+A `mipsr5900el-unknown-linux-gnu` target GCC cross-compiler is recommended,
+with for example the command `make CROSS_COMPILE=mipsr5900el-unknown-linux-gnu-`.
 
 ## Modules
 
@@ -17,7 +18,8 @@ Currently three modules are implemented:
 
 There are two main tools:
 
-`iopmod-info` prints information specific to IRX type of ELF objects, for example module name, version, and imported and exported libraries:
+`iopmod-info` prints information specific to IRX type of ELF objects, for
+example module name, version, and imported and exported libraries:
 
 ```
 % tool/iopmod-info module/printk.irx
@@ -51,7 +53,8 @@ The `--alias` option can be given to display symbols familiar from
 [PS2SDK](https://github.com/ps2dev/ps2sdk/). In the example above,
 `intrman_in_irq` would be displayed as `QueryIntrContext`.
 
-`iopmod-info` can also list modules, libraries and functions including versions that are compiled into the tool. For example:
+`iopmod-info` can also list modules, libraries and functions including
+versions that are compiled into the tool. For example:
 
 ```
 % tool/iopmod-info --list-modules --list-libraries
@@ -71,4 +74,5 @@ IOP_SIF_rpc_interface 0x0101   sifcmd 0x0101
  Multi_Thread_Manager 0x0101  thvpool 0x0101
 ```
 
-The other tool is `iopmod-link` that is used to create IRX objects that are suitable for the IOP.
+The other tool is `iopmod-link` that is used to create IRX objects that are
+suitable for the IOP.
