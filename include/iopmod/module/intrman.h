@@ -14,7 +14,7 @@ LIBRARY_ID(intrman, 0x0102);
  * interrupt controller.
  *
  * Context: thread
- * Return: 0 on success, nonzero IOP error otherwise
+ * Return: 0 on success, IOP error otherwise
  */
 id_(4) enum irq_status intrman_request_irq(unsigned int irq,
 		enum irq_mode mode, irq_handler_t handler, void *arg)
@@ -28,7 +28,7 @@ id_(4) enum irq_status intrman_request_irq(unsigned int irq,
  * interrupt controller.
  *
  * Context: thread
- * Return: 0 on success, nonzero IOP error otherwise
+ * Return: 0 on success, IOP error otherwise
  */
 id_(5) int intrman_release_irq(unsigned int irq)
 	alias_(ReleaseIntrHandler);
@@ -45,7 +45,7 @@ id_(5) int intrman_release_irq(unsigned int irq)
  * to intrman_disable_irq().
  *
  * Context: any
- * Return: 0 on success, nonzero IOP error otherwise
+ * Return: 0 on success, IOP error otherwise
  */
 id_(6) int intrman_enable_irq(unsigned int irq)
 	alias_(EnableIntr);
@@ -63,7 +63,7 @@ id_(6) int intrman_enable_irq(unsigned int irq)
  * to intrman_disable_irq().
  *
  * Context: any
- * Return: 0 on success, nonzero IOP error otherwise
+ * Return: 0 on success, IOP error otherwise
  */
 id_(7) int intrman_disable_irq(unsigned int irq, int *res)
 	alias_(DisableIntr);

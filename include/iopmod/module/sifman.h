@@ -11,19 +11,32 @@ id_(5) void sifman_init(void)
 id_(6) void sifman_set_dchain(void)
 	alias_(sceSifSetDChain);
 
-id_(7) int sifman_set_dma(struct sifman_dma_transfer *dmat, int count)
+/**
+ * sifman_set_dma - request SIF DMA transfer from sub to main
+ * @dma_tr: array of DMA transfers
+ * @count: number of array elements
+ *
+ * Note that SIF DMA transfers in the opposite direction, from main to sub,
+ * must be initiated by main.
+ *
+ * Context: any with interrupts disabled
+ * Return: DMA transfer id, or zero if no DMA id could be allocated and a
+ * 	retry may be necessary
+ */
+id_(7) int sifman_set_dma(const struct sifman_dma_transfer *dma_tr, int count)
 	alias_(sceSifSetDma);
 
 /**
  * sifman_dma_stat - status of DMA transfer
  * @dma_id: id of DMA transfer to check
  *
+ * Context: any
  * Return: status of given DMA transfer
  */
 id_(8) enum sifman_dma_status sifman_dma_stat(int dma_id)
 	alias_(sceSifDmaStat);
 
-id_(9) void sifman_set_one_dma(struct sifman_dma_transfer dmat)
+id_(9) void sifman_set_one_dma(struct sifman_dma_transfer dma_tr)
 	alias_(sceSifSetOneDma);
 
 id_(12) void sifman_dma0_transfer(void *addr, int size, int mode)
@@ -76,6 +89,6 @@ id_(30) void sifman_set_dma_intr_handler(void (*handler)(void *), void *arg)
 id_(31) void sifman_reset_dma_intr_handler(void)
 	alias_(sceSifResetDmaIntrHandler);
 
-id_(32) unsigned int sifman_set_dma_intr(struct sifman_dma_transfer *dmat,
+id_(32) unsigned int sifman_set_dma_intr(struct sifman_dma_transfer *dma_tr,
 		int len, void (*func)(void), void *data)
 	alias_(sceSifSetDmaIntr);

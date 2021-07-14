@@ -60,8 +60,8 @@ id_(11) void sif_release_cmd(int cid)
  * For interrupt context, use sifcmd_send_cmd_irq() instead.
  *
  * Context: thread
- * Return: nonzero DMA transfer id, or zero if no DMA id could be allocated
- * 	and a retry may be necessary
+ * Return: DMA transfer id, or zero if no DMA id could be allocated and a
+ * 	retry may be necessary
  */
 id_(12) unsigned int sifcmd_send_cmd(u32 cmd,
 		void *packet, size_t packet_size,
@@ -90,8 +90,8 @@ id_(12) unsigned int sifcmd_send_cmd(u32 cmd,
  * For thread context, use sifcmd_send_cmd() instead.
  *
  * Context: irq
- * Return: nonzero DMA transfer id, or zero if no DMA id could be allocated
- * 	and a retry may be necessary
+ * Return: DMA transfer id, or zero if no DMA id could be allocated and a
+ * 	retry may be necessary
  */
 id_(13) unsigned int sifcmd_send_cmd_irq(u32 cmd,
 		void *packet, size_t packet_size,
