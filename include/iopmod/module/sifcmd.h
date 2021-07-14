@@ -23,6 +23,8 @@ id_(9) void sifcmd_set_sys_cmd_buffer(
  * @cid: command id, normally limited to 0..31, with bit 31 indicating system
  * @handler: function to be called back for the command
  * @arg: optional argument passed back to the callback function, can be %NULL
+ *
+ * Context: thread
  */
 id_(10) void sif_request_cmd(int cid, sifcmd_handler handler, void *arg)
 	alias_(sceSifAddCmdHandler);
@@ -30,12 +32,14 @@ id_(10) void sif_request_cmd(int cid, sifcmd_handler handler, void *arg)
 /**
  * sif_release_cmd - deregister SIF command
  * @cid: command id, normally limited to 0..31, with bit 31 indicating system
+ *
+ * Context: thread
  */
 id_(11) void sif_release_cmd(int cid)
 	alias_(sceSifRemoveCmdHandler);
 
 /**
- * sifcmd_send_cmd - send command over the SIF
+ * sifcmd_send_cmd - send command over the SIF in a thread context
  * @cmd: command number
  * @packet: packet pointer
  * @packet_size: size in bytes of packet
@@ -53,14 +57,42 @@ id_(11) void sif_release_cmd(int cid)
  * valid until the DMA transfer has completed, when sifman_dma_stat() returns
  * %DMA_STATUS_COMPLETED.
  *
- * Context: nonirq
+ * For interrupt context, use sifcmd_send_cmd_irq() instead.
+ *
+ * Context: thread
  * Return: nonzero DMA transfer id, or zero if no DMA id could be allocated
  * 	and a retry may be necessary
  */
-id_(12) unsigned int sifcmd_send_cmd(u32 cmd, void *packet, size_t packet_size,
+id_(12) unsigned int sifcmd_send_cmd(u32 cmd,
+		void *packet, size_t packet_size,
 		const void *src, main_addr_t dst, size_t nbytes)
 	alias_(sceSifSendCmd);
 
+/**
+ * sifcmd_send_cmd_irq - send command over the SIF in an interrupt context
+ * @cmd: command number
+ * @packet: packet pointer
+ * @packet_size: size in bytes of packet
+ * @src: sub data to copy from, must be aligned with a 4-byte DMA boundary
+ * @dst: main data to copy to, must be aligned with a 16-byte DMA boundary
+ * @nbytes: size in bytes to copy, will be rounded up to multiple of 16 bytes
+ *
+ * A @packet begins with a &struct sif_cmd_header, optionally followed by a
+ * small packet payload.
+ *
+ * @packet_size must not be larger than 112 (%CMD_PACKET_PAYLOAD_MAX) bytes.
+ * @packet must be 4-byte boundary aligned. @src may be %NULL if @nbytes is 0.
+ *
+ * This call is asynchronous and both the @packet and @src buffers must remain
+ * valid until the DMA transfer has completed, when sifman_dma_stat() returns
+ * %DMA_STATUS_COMPLETED.
+ *
+ * For thread context, use sifcmd_send_cmd() instead.
+ *
+ * Context: irq
+ * Return: nonzero DMA transfer id, or zero if no DMA id could be allocated
+ * 	and a retry may be necessary
+ */
 id_(13) unsigned int sifcmd_send_cmd_irq(u32 cmd,
 		void *packet, size_t packet_size,
 		const void *src, main_addr_t dst, size_t nbytes)
