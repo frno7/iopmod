@@ -33,7 +33,7 @@ id_(7) int sifman_set_dma(const struct sif_dma_transfer *dma_tr, int count)
  * Context: any
  * Return: status of given DMA transfer
  */
-id_(8) enum sifman_dma_status sifman_dma_stat(int dma_id)
+id_(8) enum sif_dma_status sifman_dma_stat(int dma_id)
 	alias_(sceSifDmaStat);
 
 id_(9) void sifman_set_one_dma(struct sif_dma_transfer dma_tr)

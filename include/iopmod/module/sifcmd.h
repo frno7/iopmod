@@ -55,7 +55,7 @@ id_(11) void sif_release_cmd(int cid)
  *
  * This call is asynchronous and both the @packet and @src buffers must remain
  * valid until the DMA transfer has completed, when sifman_dma_stat() returns
- * %DMA_STATUS_COMPLETED.
+ * %SIF_DMA_STATUS_COMPLETED.
  *
  * For interrupt context, use sifcmd_send_cmd_irq() instead.
  *
@@ -85,7 +85,7 @@ id_(12) unsigned int sifcmd_send_cmd(u32 cmd,
  *
  * This call is asynchronous and both the @packet and @src buffers must remain
  * valid until the DMA transfer has completed, when sifman_dma_stat() returns
- * %DMA_STATUS_COMPLETED.
+ * %SIF_DMA_STATUS_COMPLETED.
  *
  * For thread context, use sifcmd_send_cmd() instead.
  *

@@ -27,7 +27,7 @@
  */
 void sif_dma_relax_for_completion(int dma_id)
 {
-	while (sifman_dma_stat(dma_id) != DMA_STATUS_COMPLETED)
+	while (sifman_dma_stat(dma_id) != SIF_DMA_STATUS_COMPLETED)
 		cpu_relax();
 }
 
