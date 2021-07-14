@@ -8,6 +8,8 @@
 
 #include "iopmod/types.h"
 
+void sif_dma_relax_for_completion(int dma_id);
+
 int sif_cmd_opt_data(u32 cmd, u32 opt,
 	const void *payload, size_t payload_size,
 	main_addr_t dst, const void *src, size_t nbytes);

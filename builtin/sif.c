@@ -13,7 +13,19 @@
 #include "iopmod/string.h"
 #include "iopmod/types.h"
 
-static void sif_dma_wait_for_completion(int dma_id)
+/**
+ * sif_dma_relax_for_completion - relax processor waiting for DMA completion
+ * @dma_id: id of DMA transfer to wait for completion
+ *
+ * The relaxation is a busy-wait that is loose enough to allow status changes,
+ * but is still only suitable for very short intervals, or when no other
+ * way of waiting can be done, such as in an interrupt context. For a thread
+ * context, it's often much better to trigger completion by an interrupt or
+ * yield by putting the thread to sleep.
+ *
+ * Context: any
+ */
+void sif_dma_relax_for_completion(int dma_id)
 {
 	while (sifman_dma_stat(dma_id) != DMA_STATUS_COMPLETED)
 		cpu_relax();
@@ -65,7 +77,7 @@ int sif_cmd_opt_data(u32 cmd, u32 opt,
 			src, dst, nbytes);
 	} while (!dma_id);
 
-	sif_dma_wait_for_completion(dma_id);
+	sif_dma_relax_for_completion(dma_id);
 
 	return 0;
 }
