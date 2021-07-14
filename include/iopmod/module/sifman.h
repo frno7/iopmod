@@ -23,7 +23,7 @@ id_(6) void sifman_set_dchain(void)
  * Return: DMA transfer id, or zero if no DMA id could be allocated and a
  * 	retry may be necessary
  */
-id_(7) int sifman_set_dma(const struct sifman_dma_transfer *dma_tr, int count)
+id_(7) int sifman_set_dma(const struct sif_dma_transfer *dma_tr, int count)
 	alias_(sceSifSetDma);
 
 /**
@@ -36,7 +36,7 @@ id_(7) int sifman_set_dma(const struct sifman_dma_transfer *dma_tr, int count)
 id_(8) enum sifman_dma_status sifman_dma_stat(int dma_id)
 	alias_(sceSifDmaStat);
 
-id_(9) void sifman_set_one_dma(struct sifman_dma_transfer dma_tr)
+id_(9) void sifman_set_one_dma(struct sif_dma_transfer dma_tr)
 	alias_(sceSifSetOneDma);
 
 id_(12) void sifman_dma0_transfer(void *addr, int size, int mode)
@@ -89,6 +89,6 @@ id_(30) void sifman_set_dma_intr_handler(void (*handler)(void *), void *arg)
 id_(31) void sifman_reset_dma_intr_handler(void)
 	alias_(sceSifResetDmaIntrHandler);
 
-id_(32) unsigned int sifman_set_dma_intr(struct sifman_dma_transfer *dma_tr,
+id_(32) unsigned int sifman_set_dma_intr(struct sif_dma_transfer *dma_tr,
 		int len, void (*func)(void), void *data)
 	alias_(sceSifSetDmaIntr);

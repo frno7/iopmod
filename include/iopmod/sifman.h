@@ -3,12 +3,20 @@
 #ifndef IOPMOD_SIFMAN_H
 #define IOPMOD_SIFMAN_H
 
-struct sifman_dma_transfer
-{
-	void	*src;
-	void	*dst;
-	int	size;
-	int	attr;
+#include <iopmod/types.h>
+
+/**
+ * struct sif_dma_transfer - SIF DMA transfer structure
+ * @src: sub data to copy from, must be aligned with a 4-byte DMA boundary
+ * @dst: main data to copy to, must be aligned with a 16-byte DMA boundary
+ * @nbytes: size in bytes to copy, will be rounded up to multiple of 16 bytes
+ * @attr: zero or DMA completion attributes
+ */
+struct sif_dma_transfer {
+	void *src;
+	main_addr_t dst;
+	size_t nbytes;
+	u32 attr;
 };
 
 /**
