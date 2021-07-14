@@ -15,12 +15,12 @@ id_(7) int sifman_set_dma(struct sifman_dma_transfer *dmat, int count)
 	alias_(sceSifSetDma);
 
 /**
- * __sifman_dma_stat - status of DMA transfer
+ * sifman_dma_stat - status of DMA transfer
  * @dma_id: id of DMA transfer to check
  *
  * Return: status of given DMA transfer
  */
-id_(8) enum sifman_dma_status __sifman_dma_stat(int dma_id)
+id_(8) enum sifman_dma_status sifman_dma_stat(int dma_id)
 	alias_(sceSifDmaStat);
 
 id_(9) void sifman_set_one_dma(struct sifman_dma_transfer dmat)

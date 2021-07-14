@@ -44,7 +44,7 @@ import  0	12	sifcmd_send_cmd
 import library	0x0101	sifcmd
 import  0	13	sifcmd_send_cmd_irq
 import library	0x0101	sifman
-import  0	 8	__sifman_dma_stat
+import  0	 8	sifman_dma_stat
 export library	0x0100	printk
 export  0	0x00b4	printk
 ```

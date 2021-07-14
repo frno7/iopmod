@@ -15,7 +15,7 @@
 
 static void sif_dma_wait_for_completion(int dma_id)
 {
-	while (__sifman_dma_stat(dma_id) != DMA_STATUS_COMPLETED)
+	while (sifman_dma_stat(dma_id) != DMA_STATUS_COMPLETED)
 		cpu_relax();
 }
 
