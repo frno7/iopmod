@@ -3,6 +3,30 @@
  * Copyright (C) 2019 Fredrik Noring
  */
 
+/**
+ * DOC: The sub-system interface (SIF) for the input/output processor (IOP)
+ *
+ * The SIF is the interface to exchange data between the sub (input/output)
+ * processor (IOP) and the main (R5900) processor and other devices connected
+ * to the main bus. The IOP handles, in whole or in part, most of the
+ * peripheral devices, including for example USB OHCI interrupts.
+ *
+ * DMA controllers (DMACs) for the IOP and the R5900 operate in cooperation
+ * through a bidirectional FIFO in the SIF. There are three DMA channels:
+ * SIF0 (sub-to-main), SIF1 (main-to-sub) and SIF2 (bidirectional).
+ *
+ * Data is transferred in packets with a tag attached to each packet. The
+ * tag contains the memory addresses in the IOP and R5900 address spaces
+ * and the size of the data to transfer.
+ *
+ * There are two mailbox type registers, the SMFLAG (sub-to-main) and
+ * MSFLAG (main-to-sub), used to indicate certain events. The MAINADDR
+ * and SUBADDR registers indicate the R5900 and IOP addresses where SIF
+ * commands are transferred by the DMAC.
+ *
+ * The IOP can assert interrupts via %IRQ_INTC_SBUS.
+ */
+
 #include "iopmod/build-bug.h"
 #include "iopmod/compare.h"
 #include "iopmod/errno.h"
