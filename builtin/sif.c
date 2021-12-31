@@ -34,7 +34,7 @@ void sif_dma_relax_for_completion(int dma_id)
 /**
  * sif_cmd_opt_data - send command over the SIF with optional argument
  * @cmd: command number
- * @opt: optional number
+ * @opt: optional argument
  * @payload: pointer to payload, any alignment
  * @payload_size: payload size, maximum %CMD_PACKET_PAYLOAD_MAX bytes
  * @dst: destination address on main processor, 16-byte aligned, or zero

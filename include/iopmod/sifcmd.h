@@ -58,6 +58,18 @@ struct sif_cmd_header
 	u32 opt;
 } __attribute__((aligned(4)));
 
+/*
+ * sif_cmd_payload - return payload of SIF command
+ * @header: SIF command header
+ *
+ * The size of the payload is max %CMD_PACKET_PAYLOAD_MAX bytes.
+ */
+#define sif_cmd_payload(header)						\
+	({								\
+		typecheck(const struct sif_cmd_header *, (header));	\
+		(void*)&(header)[1];					\
+	})
+
 struct sifcmd_sreg_data {
 	struct sif_cmd_header header;
 	int index;
