@@ -38,6 +38,25 @@ static inline int sif_cmd_data(u32 cmd_id,
 }
 
 /**
+ * sif_cmd_opt - send command over the SIF
+ * @cmd: command number
+ * @opt: optional argument
+ * @payload: pointer to payload, any alignment
+ * @payload_size: payload size, maximum %CMD_PACKET_PAYLOAD_MAX bytes
+ *
+ * This is the most convenient form of sending SIF commands without data.
+ * Waits for DMA completion.
+ *
+ * Context: any
+ * Return: 0 on success, otherwise a negative error number
+ */
+static inline int sif_cmd_opt(u32 cmd_id, u32 opt,
+	const void *payload, size_t payload_size)
+{
+	return sif_cmd_opt_data(cmd_id, opt, payload, payload_size, 0, NULL, 0);
+}
+
+/**
  * sif_cmd - send command over the SIF
  * @cmd: command number
  * @payload: pointer to payload, any alignment
@@ -52,7 +71,7 @@ static inline int sif_cmd_data(u32 cmd_id,
 static inline int sif_cmd(u32 cmd_id,
 	const void *payload, size_t payload_size)
 {
-	return sif_cmd_data(cmd_id, payload, payload_size, 0, NULL, 0);
+	return sif_cmd_opt(cmd_id, 0, payload, payload_size);
 }
 
 #endif /* IOPMOD_LINUX_SIF_H */
