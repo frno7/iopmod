@@ -1,0 +1,47 @@
+name: CI-compile
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/${{ github.repository_owner }}/mipsr5900el-gentoo-linux-gnu:main
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Compile modules
+        run: make module V=1
+
+      - name: Upload modules as artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: iopmod-modules-${{ github.sha }}
+          path: module/*.irx
+
+      - name: Compile tools
+        run: |
+          make clean
+          make tool V=1 S=1
+          tar -czvf iopmod-tools.tar.gz tool/iopmod-info tool/iopmod-link tool/iopmod-symc
+
+      - name: Upload tools as artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: iopmod-tools-${{ github.sha }}
+          path: iopmod-tools.tar.gz
+
+      - name: Upload kernel as pre-release
+        if: github.ref == 'refs/heads/master'
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: true
+          automatic_release_tag: "latest"
+          title: Development build
+          files: |
+            iopmod-modules-${{ github.sha }}
+            iopmod-tools.tar.gz
