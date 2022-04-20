@@ -12,14 +12,16 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Compile modules
-        run: make module V=1
+        run: |
+          make module V=1
+          tar -czvf iopmod-modules.tar.gz module/*.irx
 
       - name: Upload modules as artifact
         if: ${{ success() }}
         uses: actions/upload-artifact@v3
         with:
           name: iopmod-modules-${{ github.sha }}
-          path: module/*.irx
+          path: iopmod-modules.tar.gz
 
       - name: Compile tools
         run: |
@@ -43,5 +45,5 @@ jobs:
           automatic_release_tag: "latest"
           title: Development build
           files: |
-            iopmod-modules-${{ github.sha }}
+            iopmod-modules.tar.gz
             iopmod-tools.tar.gz
