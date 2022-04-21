@@ -2,6 +2,7 @@
 #
 # Define V=1 for more verbose compile.
 # Define S=1 for sanitation checks.
+# Define LDFLAGS=-static for statically linked tools.
 
 CFLAGS += -Wall -Iinclude
 
@@ -11,6 +12,8 @@ ifeq "$(S)" "1"
 TOOL_CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 	  -fsanitize-address-use-after-scope -fstack-check
 endif
+
+TOOL_LDFLAGS += $(TOOL_CFLAGS) $(LDFLAGS)
 
 MODULE_LD := script/iop.ld
 # FIXME: -O0 -> -O2
@@ -57,13 +60,13 @@ $(SYMTAB_C_SYM): $(MODULE_H_ALL)
 	$(QUIET_GEN)$(IOPMOD_SYMC) -o $@ $(MODULE_H_ALL)
 
 $(IOPMOD_INFO): $(IOPMOD_INFO).o $(TOOL_LIB) $(SYMTAB_C_OBJ)
-	$(QUIET_LINK)$(CC) $(TOOL_CFLAGS) -o $@ $^
+	$(QUIET_LINK)$(CC) $(TOOL_LDFLAGS) -o $@ $^
 
 $(IOPMOD_LINK): $(IOPMOD_LINK).o $(TOOL_LIB)
-	$(QUIET_LINK)$(CC) $(TOOL_CFLAGS) -o $@ $^
+	$(QUIET_LINK)$(CC) $(TOOL_LDFLAGS) -o $@ $^
 
 $(IOPMOD_SYMC): $(IOPMOD_SYMC).o $(TOOL_LIB)
-	$(QUIET_LINK)$(CC) $(TOOL_CFLAGS) -o $@ $^
+	$(QUIET_LINK)$(CC) $(TOOL_LDFLAGS) -o $@ $^
 
 $(TOOL_LIB): $(TOOL_C_OBJ)
 	$(QUIET_AR)$(AR) rc $@ $^
