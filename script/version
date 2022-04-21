@@ -1,14 +1,29 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 set -o pipefail
 
+if [ -f version ]
+then
+	ver="$(cat version)"
+elif [ -d .git ]
+then
+	mod=$([ -z "$(git status -suno)" ] || echo "+")
+	tag="$(git describe --always --tags)"
+	ver="$(echo "$tag" | sed 's/^v//')$mod"
+else
+	ver="-"
+fi
+
+if [ $# = 0 ]
+then
+	echo "$ver"
+	exit
+fi
+
 [ $# = 1 ]
 f="$1"
 
-mod=$([ -z "$(git status -suno)" ] || echo "+")
-tag="$(git describe --always --tags)"
-ver="$(echo "$tag" | sed 's/^v//')$mod"
 src=$(echo "#include "'"'"iopmod/version.h"'"'"
 
 const char *program_version(void) { return "'"'"$ver"'"'"; }")
