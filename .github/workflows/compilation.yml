@@ -1,47 +1,69 @@
-name: CI-compile
+name: Compile and publish IOP modules and tools
 
 on:
   push:
   pull_request:
 
 jobs:
-  build:
+  modules:
     runs-on: ubuntu-latest
     container: ghcr.io/${{ github.repository_owner }}/mipsr5900el-gentoo-linux-gnu:main
     steps:
       - uses: actions/checkout@v3
 
-      - name: Compile modules
-        run: make module V=1
-
-      - name: Upload modules as artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: iopmod-modules-${{ github.sha }}
-          path: module/*.irx
-
-      - name: Compile tools
+      - name: Arcive tag
         run: |
-          make clean
-          make tool V=1 S=1
-          tar -czvf iopmod-tools.tar.gz tool/iopmod-info tool/iopmod-link tool/iopmod-symc
+          echo "ARCHIVE_TAG=${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
 
-      - name: Upload tools as artifact
+      - name: Compile IOP modules
+        run: |
+          make module V=1
+          tar czvf iopmod-modules-${{ env.ARCHIVE_TAG }}.tar.gz module/*.irx
+
+      - name: Publish IOP modules
         if: ${{ success() }}
         uses: actions/upload-artifact@v3
         with:
-          name: iopmod-tools-${{ github.sha }}
-          path: iopmod-tools.tar.gz
+          name: "iopmod-modules-${{ env.ARCHIVE_TAG }}"
+          path: iopmod-modules-${{ env.ARCHIVE_TAG }}.tar.gz
 
-      - name: Upload kernel as pre-release
-        if: github.ref == 'refs/heads/master'
-        uses: marvinpinto/action-automatic-releases@latest
+  tools:
+    strategy:
+      matrix:
+        arch: [ppc64le, aarch64, x86_64]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Arcive tag
+        run: |
+          echo "ARCHIVE_TAG=${{ matrix.arch }}-${GITHUB_REF_NAME}-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
+
+      - uses: uraimo/run-on-arch-action@v2.2.0
+        name: Compile ${{ matrix.arch }} IOP tools
+        if: ${{ matrix.arch != 'x86_64' }}
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: true
-          automatic_release_tag: "latest"
-          title: Development build
-          files: |
-            iopmod-modules-${{ github.sha }}
-            iopmod-tools.tar.gz
+          arch: ${{ matrix.arch }}
+          # Not required, but speeds up builds
+          githubToken: ${{ github.token }}
+          install: |
+            apt-get update -q -y
+            apt-get install -q -y git make gcc libc-dev
+          run: |
+            # Avoid fatal: unsafe repository ('/home/runner/work/iopmod/iopmod' is owned by someone else)
+            git config --global --add safe.directory "$PWD"
+            make tool LDFLAGS=-static V=1
+            tar czvf "iopmod-tools-${{ env.ARCHIVE_TAG }}.tar.gz" tool/iopmod-{info,link,symc}
+
+      - name: Compile x86_64 IOP tools
+        if: ${{ matrix.arch == 'x86_64' }}
+        run: |
+          make tool LDFLAGS=-static V=1
+          tar czvf "iopmod-tools-${{ env.ARCHIVE_TAG }}.tar.gz" tool/iopmod-{info,link,symc}
+
+      - name: Publish IOP tools
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: "iopmod-tools-${{ env.ARCHIVE_TAG }}"
+          path: iopmod-tools-${{ env.ARCHIVE_TAG }}.tar.gz
