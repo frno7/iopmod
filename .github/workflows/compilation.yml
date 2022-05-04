@@ -17,7 +17,7 @@ jobs:
 
       - name: Compile IOP modules
         run: |
-          make module V=1
+          make module CROSS_COMPILE=mipsr5900el-unknown-linux-gnu- V=1
           tar czvf iopmod-modules-${{ env.ARCHIVE_TAG }}.tar.gz module/*.irx
 
       - name: Publish IOP modules
