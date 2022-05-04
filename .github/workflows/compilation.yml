@@ -7,7 +7,7 @@ on:
 jobs:
   modules:
     runs-on: ubuntu-latest
-    container: ghcr.io/${{ github.repository_owner }}/mipsr5900el-gentoo-linux-gnu:main
+    container: ghcr.io/${{ github.repository_owner }}/gentoo-mipsr5900el:main
     steps:
       - uses: actions/checkout@v3
 
