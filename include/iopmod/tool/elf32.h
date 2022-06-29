@@ -8,7 +8,8 @@
 #ifndef IOPMOD_TOOL_ELF32_H
 #define IOPMOD_TOOL_ELF32_H
 
-#include <elf.h>
+/* Mac OS doesn't have <elf.h>, so include "compat/elf.h" instead. */
+#include "compat/elf.h"
 
 typedef Elf32_Half    Elf_Half;
 typedef Elf32_Word    Elf_Word;
