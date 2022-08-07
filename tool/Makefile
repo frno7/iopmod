@@ -27,6 +27,9 @@ SYMTAB_C_SRC = tool/symtab.c
 SYMTAB_C_SYM = tool/symtab.sym.h
 SYMTAB_C_OBJ = $(SYMTAB_C_SRC:%.c=%.o)
 
+$(TOOL_LIB): $(TOOL_C_OBJ)
+	$(QUIET_AR)$(AR) rc $@ $^
+
 .PHONY: tool
 tool: $(IOPMOD_INFO) $(IOPMOD_LINK) $(IOPMOD_SYMC)
 
@@ -35,17 +38,10 @@ $(SYMTAB_C_SYM): $(IOPMOD_SYMC)
 $(SYMTAB_C_SYM): $(MODULE_H_ALL)
 	$(QUIET_GEN)$(IOPMOD_SYMC) -o $@ $(MODULE_H_ALL)
 
-$(IOPMOD_INFO): $(IOPMOD_INFO).o $(TOOL_LIB) $(SYMTAB_C_OBJ)
-	$(QUIET_LINK)$(CC) $(TOOL_LDFLAGS) -o $@ $^
+$(IOPMOD_INFO): $(SYMTAB_C_OBJ)
 
-$(IOPMOD_LINK): $(IOPMOD_LINK).o $(TOOL_LIB)
+$(IOPMOD_INFO) $(IOPMOD_LINK) $(IOPMOD_SYMC): %: %.o $(TOOL_LIB)
 	$(QUIET_LINK)$(CC) $(TOOL_LDFLAGS) -o $@ $^
-
-$(IOPMOD_SYMC): $(IOPMOD_SYMC).o $(TOOL_LIB)
-	$(QUIET_LINK)$(CC) $(TOOL_LDFLAGS) -o $@ $^
-
-$(TOOL_LIB): $(TOOL_C_OBJ)
-	$(QUIET_AR)$(AR) rc $@ $^
 
 $(IOPMOD_SYMC_OBJ):
 
