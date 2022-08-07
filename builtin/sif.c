@@ -57,7 +57,7 @@ int sif_cmd_opt_data(u32 cmd, u32 opt,
 		in_irq() ? sifcmd_send_cmd_irq : sifcmd_send_cmd;
 	struct {
 		struct sif_cmd_header header;
-		u8 payload[min_t(size_t, payload_size, CMD_PACKET_PAYLOAD_MAX)];
+		u8 payload[CMD_PACKET_PAYLOAD_MAX];
 	} packet;
 	int dma_id;
 
