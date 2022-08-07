@@ -46,7 +46,7 @@ OTHER_CLEAN += GPATH GRTAGS GTAGS
 
 .PHONY: clean
 clean:
-	$(QUIET_RM)$(RM) -f $(ALL_OBJ) $(ALL_DEP) $(OTHER_CLEAN)
+	$(QUIET_RM)$(RM) $(ALL_OBJ) $(ALL_DEP) $(OTHER_CLEAN)
 
 V             = @
 Q             = $(V:1=)
