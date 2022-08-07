@@ -6,8 +6,8 @@
 
 CFLAGS += -Wall -Iinclude
 
-ifeq "$(S)" "1"
-TOOL_CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
+ifeq (1,$(S))
+TOOL_CFLAGS = -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 	  -fsanitize-address-use-after-scope -fstack-check
 endif
 
@@ -32,35 +32,20 @@ include tool/Makefile
 include builtin/Makefile
 include module/Makefile
 
-#
-# test
-#
-
 .PHONY: check
 check: test
 
-#
-# Clean
-#
+.PHONY: gtags
+gtags:
+	$(QUIET_GEN)gtags
+OTHER_CLEAN += GPATH GRTAGS GTAGS
 
 .PHONY: clean
 clean:
 	$(QUIET_RM)$(RM) -f $(VERSION_SRC) */*.a */*.o */*.o.d		\
 		*/*.mod.* */*.sym.* */*.iop */*.irx */*.tmp		\
 		$(IOPMOD_INFO) $(IOPMOD_LINK) $(IOPMOD_SYMC)		\
-		GPATH GRTAGS GTAGS
-
-#
-# Global tags
-#
-
-.PHONY: gtags
-gtags:
-	$(QUIET_GEN)gtags
-
-#
-# General
-#
+		$(OTHER_CLEAN)
 
 V             = @
 Q             = $(V:1=)
