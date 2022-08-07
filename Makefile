@@ -11,13 +11,15 @@ TOOL_CFLAGS = -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 	  -fsanitize-address-use-after-scope -fstack-check
 endif
 
+DEP_CFLAGS = -Wp,-MMD,$(@D)/$(@F).d -MT $(@D)/$(@F)
+
 MODULE_LD := script/iop.ld
 # FIXME: -O0 -> -O2
 IOP_CFLAGS += -O0 -march=r3000 -EL -msoft-float -fomit-frame-pointer	\
        -fno-pic -mno-abicalls -fno-common -ffreestanding -static	\
        -fno-strict-aliasing -nostdlib -mlong-calls -mno-gpopt		\
        -mno-shared -G0 -ffunction-sections -fdata-sections		\
-       $(CFLAGS) $(BASIC_CFLAGS)
+       $(CFLAGS) $(DEP_CFLAGS)
 IOP_LDFLAGS += -O2 --gpsize=0 -G0 --nmagic --orphan-handling=error	\
 	--discard-all --gc-sections --emit-relocs -nostdlib		\
 	-z max-page-size=4096 --no-relax --script=$(MODULE_LD)
@@ -56,9 +58,4 @@ QUIET_LINK    = $(Q:@=@echo    '  LD      '$@;)
 QUIET_TEST    = $(Q:@=@echo    '  TEST    '$@;)
 QUIET_RM      = $(Q:@=@echo    '  RM      '$@;)
 
-BASIC_CFLAGS += -Wp,-MMD,$(@D)/$(@F).d -MT $(@D)/$(@F)
-
-ifneq "$(MAKECMDGOALS)" "clean"
-   DEP_FILES := $(wildcard */*.d)
-   $(if $(DEP_FILES),$(eval -include $(DEP_FILES)))
-endif
+$(eval -include $(ALL_DEP))
