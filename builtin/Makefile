@@ -18,6 +18,10 @@ BUILTIN_C_OBJ = $(BUILTIN_C_SRC:%.c=%.o)
 
 ALL_OBJ += $(BUILTIN_C_OBJ)
 
+builtin/memcpy.o							\
+builtin/memset.o:							\
+	IOP_CFLAGS += -fno-tree-loop-distribute-patterns
+
 $(BUILTIN_C_OBJ): %.o : %.c
 	$(QUIET_CC)$(CCC) $(IOP_CFLAGS) -c -o $@ $<
 
