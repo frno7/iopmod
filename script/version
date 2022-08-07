@@ -3,22 +3,52 @@
 set -e
 set -o pipefail
 
-if [ -f version ]
+if [ x"$1" = x--help ]
 then
-	ver="$(cat version)"
-elif [ -d .git ]
+	echo "usage: $(basename "$0") [--directory <path>] [--check] [version.c]"
+	echo
+	echo "Generate the given version.c file, unless --check is given. If no version.c"
+	echo "path is given, print the version to standard output."
+	echo
+	echo "Options:"
+	echo
+	echo "  --directory <path>  change to the given path to determine version"
+	echo "  --check             print the given version.c path if it needs an update"
+	echo
+	exit
+fi
+
+if [ x"$1" = x--directory ]
 then
-	mod=$([ -z "$(git status -suno)" ] || echo "+")
-	tag="$(git describe --always --tags)"
+	shift
+	dir="$1"/
+	shift
+else
+	dir=""
+fi
+
+if [ -f "$dir"version ]
+then
+	ver="$(cat "$dir"version)"
+elif [ -e .git ]
+then
+	mod=$([ -z "$(git -C "$dir" status -suno)" ] || echo "+")
+	tag="$(git -C "$dir" describe --always --tags)"
 	ver="$(echo "$tag" | sed 's/^v//')$mod"
 else
-	ver="-"
+	ver=""
 fi
 
 if [ $# = 0 ]
 then
 	echo "$ver"
 	exit
+fi
+
+if [ x"$1" = x--check ]
+then
+	check=1
+	shift
 fi
 
 [ $# = 1 ]
@@ -30,9 +60,13 @@ const char *program_version(void) { return "'"'"$ver"'"'"; }")
 
 if [ ! -f "$f" ] || ! echo "$src" | cmp --quiet - "$f"
 then
-	echo "$src" >"$f".tmp
-	mv "$f".tmp "$f"
-	echo "$f"
+	if [ x"$check" = x1 ]
+	then
+		echo "$f"
+	else
+		echo "$src" >"$f".tmp
+		mv "$f".tmp "$f"
+	fi
 else
 	:
 fi

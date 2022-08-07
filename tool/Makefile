@@ -59,6 +59,6 @@ $(TOOL_C_OBJ) $(TOOL_OBJ) $(SYMTAB_C_OBJ): %.o : %.c
 $(TOOL_S_OBJ): %.o : %.S
 	$(QUIET_AS)$(CC) $(TOOL_CFLAGS) -c -o $@ $<
 
-.PHONY: $(shell script/version $(VERSION_SRC))
+.PHONY: $(shell script/version --check $(VERSION_SRC))
 $(VERSION_SRC):
-	@script/version $@
+	$(QUIET_GEN)script/version $@
