@@ -12,6 +12,8 @@ IOPMOD_MODC = script/iopmod-modc
 
 TOOL_LIB = tool/tool.a
 
+OTHER_CLEAN += $(IOPMOD_INFO) $(IOPMOD_LINK) $(IOPMOD_SYMC) $(TOOL_LIB)
+
 TOOL_C_SRC = $(addprefix tool/,						\
 	elf32.c								\
 	file.c								\

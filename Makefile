@@ -42,9 +42,8 @@ OTHER_CLEAN += GPATH GRTAGS GTAGS
 
 .PHONY: clean
 clean:
-	$(QUIET_RM)$(RM) -f $(VERSION_SRC) */*.a */*.o */*.o.d		\
+	$(QUIET_RM)$(RM) -f $(VERSION_SRC) */*.o */*.o.d		\
 		*/*.mod.* */*.sym.* */*.iop */*.irx */*.tmp		\
-		$(IOPMOD_INFO) $(IOPMOD_LINK) $(IOPMOD_SYMC)		\
 		$(OTHER_CLEAN)
 
 V             = @
