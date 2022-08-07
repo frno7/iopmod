@@ -29,7 +29,7 @@ SYMTAB_C_SRC = tool/symtab.c
 SYMTAB_C_SYM = tool/symtab.sym.h
 SYMTAB_C_OBJ = $(SYMTAB_C_SRC:%.c=%.o)
 
-OTHER_CLEAN += $(SYMTAB_C_SYM)
+OTHER_CLEAN += $(SYMTAB_C_SYM) $(VERSION_SRC)
 
 $(TOOL_LIB): $(TOOL_C_OBJ)
 	$(QUIET_AR)$(AR) rc $@ $^
