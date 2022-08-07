@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-2.0
 
-TOOL_CFLAGS += -O2 -g $(CFLAGS) $(BASIC_CFLAGS)
+TOOL_CFLAGS = -O2 -g $(BASIC_CFLAGS)
 
-TOOL_LDFLAGS += $(TOOL_CFLAGS) $(LDFLAGS)
+TOOL_LDFLAGS = $(TOOL_CFLAGS) $(LDFLAGS)
 
 VERSION_SRC = tool/version.c
 IOPMOD_INFO = tool/iopmod-info

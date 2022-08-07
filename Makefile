@@ -4,7 +4,7 @@
 # Define S=1 for sanitation checks.
 # Define LDFLAGS=-static for statically linked tools.
 
-CFLAGS += -Wall -Iinclude
+CFLAGS =
 
 ifeq (1,$(S))
 TOOL_CFLAGS = -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
@@ -12,15 +12,17 @@ TOOL_CFLAGS = -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 endif
 
 DEP_CFLAGS = -Wp,-MMD,$(@D)/$(@F).d -MT $(@D)/$(@F)
+BASIC_CFLAGS = -Wall -Iinclude $(DEP_CFLAGS) $(CFLAGS)
 
-MODULE_LD := script/iop.ld
+MODULE_LD = script/iop.ld
+
 # FIXME: -O0 -> -O2
-IOP_CFLAGS += -O0 -march=r3000 -EL -msoft-float -fomit-frame-pointer	\
+IOP_CFLAGS = -O0 -march=r3000 -EL -msoft-float -fomit-frame-pointer	\
        -fno-pic -mno-abicalls -fno-common -ffreestanding -static	\
        -fno-strict-aliasing -nostdlib -mlong-calls -mno-gpopt		\
        -mno-shared -G0 -ffunction-sections -fdata-sections		\
-       $(CFLAGS) $(DEP_CFLAGS)
-IOP_LDFLAGS += -O2 --gpsize=0 -G0 --nmagic --orphan-handling=error	\
+       $(BASIC_CFLAGS)
+IOP_LDFLAGS = -O2 --gpsize=0 -G0 --nmagic --orphan-handling=error	\
 	--discard-all --gc-sections --emit-relocs -nostdlib		\
 	-z max-page-size=4096 --no-relax --script=$(MODULE_LD)
 
