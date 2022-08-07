@@ -7,7 +7,7 @@
 CFLAGS =
 
 ifeq (1,$(S))
-TOOL_CFLAGS = -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
+S_CFLAGS = -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 	  -fsanitize-address-use-after-scope -fstack-check
 endif
 
