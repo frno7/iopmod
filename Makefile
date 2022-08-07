@@ -6,14 +6,10 @@
 
 CFLAGS += -Wall -Iinclude
 
-TOOL_CFLAGS += -O2 -g $(CFLAGS) $(BASIC_CFLAGS)
-
 ifeq "$(S)" "1"
 TOOL_CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
 	  -fsanitize-address-use-after-scope -fstack-check
 endif
-
-TOOL_LDFLAGS += $(TOOL_CFLAGS) $(LDFLAGS)
 
 MODULE_LD := script/iop.ld
 # FIXME: -O0 -> -O2
@@ -32,59 +28,7 @@ CLD = $(CROSS_COMPILE)ld
 .PHONY: all
 all: module tool
 
-#
-# Tool
-#
-
-VERSION_SRC := tool/version.c
-IOPMOD_INFO := tool/iopmod-info
-IOPMOD_LINK := tool/iopmod-link
-IOPMOD_SYMC := tool/iopmod-symc
-IOPMOD_MODC := script/iopmod-modc
-
-TOOL_LIB := tool/tool.a
-TOOL_C_SRC := tool/elf32.c tool/file.c tool/irx.c tool/lexc.c		\
-	tool/print.c tool/string.c $(VERSION_SRC)
-TOOL_C_OBJ = $(patsubst %.c, %.o, $(TOOL_C_SRC))
-
-SYMTAB_C_SRC := tool/symtab.c
-SYMTAB_C_SYM := tool/symtab.sym.h
-SYMTAB_C_OBJ = $(patsubst %.c, %.o, $(SYMTAB_C_SRC))
-
-.PHONY: tool
-tool: $(IOPMOD_INFO) $(IOPMOD_LINK) $(IOPMOD_SYMC)
-
-$(SYMTAB_C_OBJ): $(SYMTAB_C_SYM)
-$(SYMTAB_C_SYM): $(IOPMOD_SYMC)
-$(SYMTAB_C_SYM): $(MODULE_H_ALL)
-	$(QUIET_GEN)$(IOPMOD_SYMC) -o $@ $(MODULE_H_ALL)
-
-$(IOPMOD_INFO): $(IOPMOD_INFO).o $(TOOL_LIB) $(SYMTAB_C_OBJ)
-	$(QUIET_LINK)$(CC) $(TOOL_LDFLAGS) -o $@ $^
-
-$(IOPMOD_LINK): $(IOPMOD_LINK).o $(TOOL_LIB)
-	$(QUIET_LINK)$(CC) $(TOOL_LDFLAGS) -o $@ $^
-
-$(IOPMOD_SYMC): $(IOPMOD_SYMC).o $(TOOL_LIB)
-	$(QUIET_LINK)$(CC) $(TOOL_LDFLAGS) -o $@ $^
-
-$(TOOL_LIB): $(TOOL_C_OBJ)
-	$(QUIET_AR)$(AR) rc $@ $^
-
-$(IOPMOD_SYMC_OBJ):
-
-$(TOOL_C_OBJ)								\
-$(IOPMOD_INFO).o $(IOPMOD_LINK).o $(IOPMOD_SYMC).o			\
-$(SYMTAB_C_OBJ): %.o : %.c
-	$(QUIET_CC)$(CC) $(TOOL_CFLAGS) -c -o $@ $<
-
-$(TOOL_S_OBJ): %.o : %.S
-	$(QUIET_AS)$(CC) $(TOOL_CFLAGS) -c -o $@ $<
-
-.PHONY: $(shell script/version $(VERSION_SRC))
-$(VERSION_SRC):
-	@script/version $@
-
+include tool/Makefile
 include builtin/Makefile
 
 #
