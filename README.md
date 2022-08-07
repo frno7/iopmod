@@ -1,18 +1,28 @@
+![compilation workflow](https://github.com/frno7/iopmod/actions/workflows/compilation.yml/badge.svg)
+
 # PlayStation 2 input/output processor (IOP) modules
 
-The [input/output processor (IOP)](https://en.wikipedia.org/wiki/PlayStation_2_technical_specifications#I/O_processor) is a [MIPS R3000A](https://en.wikipedia.org/wiki/R3000), or in later PlayStation 2 models a [PowerPC 405GP](https://en.wikipedia.org/wiki/PowerPC_400#PowerPC_405) emulating a MIPS R3000A. This processor provides a number of services, for example handling of USB OHCI interrupts. These are implemented as IOP modules that the Linux kernel loads as firmware. IOP modules are IRX objects based on the [executable and linkable format](https://en.wikipedia.org/wiki/Executable_and_Linkable_Format) (ELF).
+The [input/output processor (IOP)](https://en.wikipedia.org/wiki/PlayStation_2_technical_specifications#I/O_processor)
+is a [MIPS R3000A](https://en.wikipedia.org/wiki/R3000), or in later
+PlayStation 2 models a
+[PowerPC 405GP](https://en.wikipedia.org/wiki/PowerPC_400#PowerPC_405)
+emulating a MIPS R3000A. This processor provides a number of services,
+for example handling of USB OHCI interrupts. These are implemented as
+IOP modules that the Linux kernel loads as firmware. IOP modules are
+IRX objects based on the
+[executable and linkable format](https://en.wikipedia.org/wiki/Executable_and_Linkable_Format) (ELF).
 
 ## Building
 
-A `mipsr5900el-unknown-linux-gnu` target GCC cross-compiler is recommended,
-with for example the command `make CROSS_COMPILE=mipsr5900el-unknown-linux-gnu-`.
+A `mipsr5900el-unknown-linux-gnu` target GCC compiler is recommended, with
+for example the command `make CROSS_COMPILE=mipsr5900el-unknown-linux-gnu-`.
 
 ## Modules
 
 Currently three modules are implemented:
-[irq](module/irq.c),
-[irqrelay](module/irqrelay.c) and
-[printk](module/printk.c).
+[`irq`](module/irq.c),
+[`irqrelay`](module/irqrelay.c) and
+[`printk`](module/printk.c).
 
 ## Tools
 
