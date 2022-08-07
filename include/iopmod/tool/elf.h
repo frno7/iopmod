@@ -58,6 +58,7 @@ char *elf_section_name(Elf_Shdr *shdr, Elf_Ehdr *ehdr);
 
 Elf_Shdr *elf_first_section_with_name(const char *name, Elf_Ehdr *ehdr);
 
+char *elf_symbol(Elf_Sym *sym, Elf_Shdr *shdr, Elf_Ehdr *ehdr);
 char *elf_symbol_for_addr(Elf_Addr addr, Elf_Ehdr *ehdr);
 
 bool elf_identify(void *buffer, size_t size);

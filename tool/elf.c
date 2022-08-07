@@ -150,20 +150,25 @@ void *elf_next_ent(void *ent, Elf_Shdr *shdr, Elf_Ehdr *ehdr)
 	return &next[shdr->sh_entsize] > past ? NULL : next;
 }
 
+char *elf_symbol(Elf_Sym *sym, Elf_Shdr *shdr, Elf_Ehdr *ehdr)
+{
+	if (ELF_ST_TYPE(sym->st_info) == STT_SECTION)
+		return elf_section_name(&elf_first_section(ehdr)[sym->st_shndx], ehdr);
+
+	Elf_Shdr *strhdr = &elf_first_section(ehdr)[shdr->sh_link];
+	char *strings = elf_ent_for_offset(strhdr->sh_offset, ehdr);
+
+	return &strings[sym->st_name];
+}
+
 char *elf_symbol_for_addr(Elf_Addr addr, Elf_Ehdr *ehdr)
 {
 	Elf_Shdr *shdr;
 	Elf_Sym *sym;
 
 	elf_for_each_sym (sym, shdr, ehdr)
-		if (sym->st_value == addr) {
-			Elf_Shdr *strhdr =
-				&elf_first_section(ehdr)[shdr->sh_link];
-			char *strings =
-				elf_ent_for_offset(strhdr->sh_offset, ehdr);
-
-			return &strings[sym->st_name];
-		}
+		if (sym->st_value == addr)
+			return elf_symbol(sym, shdr, ehdr);
 
 	return NULL;
 }

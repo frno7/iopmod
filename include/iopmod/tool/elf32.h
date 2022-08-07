@@ -27,6 +27,9 @@ typedef Elf32_Sym     Elf_Sym;
 typedef Elf32_Syminfo Elf_Syminfo;
 typedef Elf32_Rel     Elf_Rel;
 
+#define ELF_ST_BIND(st_info) ELF32_ST_BIND(st_info)
+#define ELF_ST_TYPE(st_info) ELF32_ST_TYPE(st_info)
+
 #define ELF_R_TYPE(r_info) ELF32_R_TYPE(r_info)
 #define ELF_R_SYM(r_info)  ELF32_R_SYM(r_info)
 
