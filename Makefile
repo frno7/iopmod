@@ -85,22 +85,7 @@ $(TOOL_S_OBJ): %.o : %.S
 $(VER):
 	@script/version $@
 
-#
-# Builtin
-#
-
-BUILTIN_LIB := builtin/builtin.a
-BUILTIN_C_SRC = $(wildcard builtin/*.c)
-BUILTIN_C_OBJ = $(patsubst %.c, %.o, $(BUILTIN_C_SRC))
-
-.PHONY: builtin
-builtin: $(BUILTIN_LIB)
-
-$(BUILTIN_LIB): $(BUILTIN_C_OBJ)
-	$(QUIET_AR)$(AR) rc $@ $^
-
-$(BUILTIN_C_OBJ): %.o : %.c
-	$(QUIET_CC)$(CCC) $(IOP_CFLAGS) -c -o $@ $<
+include builtin/Makefile
 
 #
 # Module
