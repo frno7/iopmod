@@ -28,6 +28,7 @@
 char progname[] = "iopmod-link";
 
 static struct {
+	int strip;
 	const char *input;
 	const char *output;
 } option;
@@ -47,6 +48,16 @@ static void link_module(struct file f)
 	shdr->sh_type = SHT_IOPMOD;
 }
 
+static void strip_module(struct file f)
+{
+	Elf_Ehdr *ehdr = f.data;
+	Elf_Shdr *shdr;
+	Elf_Sym *sym;
+
+	elf_for_each_sym (sym, shdr, ehdr)
+		sym->st_name = 0;
+}
+
 static void help(FILE *file)
 {
 	fprintf(file,
@@ -56,6 +67,7 @@ static void help(FILE *file)
 "    -h, --help              display this help and exit\n"
 "    --version               display version and exit\n"
 "\n"
+"    --strip                 strip string table\n"
 "    -o, --output <outfile>  name for the IOP module produced by %s\n"
 "\n",
 		progname, progname);
@@ -79,9 +91,10 @@ static void parse_options(int argc, char **argv)
 #define OPT(option) (strcmp(options[index].name, (option)) == 0)
 
 	static const struct option options[] = {
-		{ "help",    no_argument,       NULL, 0 },
-		{ "version", no_argument,       NULL, 0 },
-		{ "output",  required_argument, NULL, 0 },
+		{ "help",    no_argument,       NULL,          0 },
+		{ "version", no_argument,       NULL,          0 },
+		{ "strip",   no_argument,       &option.strip, 1 },
+		{ "output",  required_argument, NULL,          0 },
 		{ NULL, 0, NULL, 0 }
 	};
 
@@ -133,7 +146,10 @@ int main(int argc, char **argv)
 	if (!file_valid(f))
 		pr_fatal_errno(option.input);
 
-	link_module(f);
+	if (option.strip)
+		strip_module(f);
+	else
+		link_module(f);
 
 	if (!file_rename(option.output, &f))
 		pr_fatal_errno(option.output);

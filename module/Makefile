@@ -57,4 +57,6 @@ $(MODULE_IOP): %.iop : %.o
 $(MODULE_IRX): $(IOPMOD_LINK)
 
 $(MODULE_IRX): %.irx : %.iop
-	$(QUIET_LINK)$(IOPMOD_LINK) -o $@ $<
+	$(QUIET_LINK)$(IOPMOD_LINK) --strip -o $@ $<
+	$(QUIET_LINK)$(CROSS_COMPILE)objcopy $@ $@
+	$(QUIET_LINK)$(IOPMOD_LINK) -o $@ $@
