@@ -26,8 +26,9 @@ IOP_LDFLAGS = -O2 --gpsize=0 -G0 --nmagic --orphan-handling=error	\
 	--discard-all --gc-sections --emit-relocs -nostdlib		\
 	-z max-page-size=4096 --no-relax --script=$(MODULE_LD)
 
-CCC = $(CROSS_COMPILE)gcc
-CLD = $(CROSS_COMPILE)ld
+TARGET_CC = $(CROSS_COMPILE)gcc
+TARGET_LD = $(CROSS_COMPILE)ld
+TARGET_OBJCOPY = $(CROSS_COMPILE)objcopy
 
 .PHONY: all
 all: module tool

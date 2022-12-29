@@ -23,7 +23,7 @@ builtin/memset.o:							\
 	IOP_CFLAGS += -fno-tree-loop-distribute-patterns
 
 $(BUILTIN_OBJ): %.o: %.c
-	$(QUIET_CC)$(CCC) $(IOP_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(IOP_CFLAGS) -c -o $@ $<
 
 BUILTIN_LIB = builtin/builtin.a
 

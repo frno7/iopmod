@@ -36,21 +36,21 @@ $(MODULE_C_MOD): $(IOPMOD_MODC) include/iopmod/mod.h
 $(MODULE_M_OBJ): %.mod.o : %.sym.h
 
 %.mod.o : %.mod.c
-	$(QUIET_CC)$(CCC) $(IOP_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(IOP_CFLAGS) -c -o $@ $<
 
 $(MODULE_C_OBJ): %.o : %.c
-	$(QUIET_CC)$(CCC) $(IOP_CFLAGS) -c -o $@ $<
+	$(QUIET_CC)$(TARGET_CC) $(IOP_CFLAGS) -c -o $@ $<
 
 $(MODULE_S_OBJ): %.sym.o : %.sym.h
 
 $(MODULE_S_OBJ): %.o : %.S
-	$(QUIET_AS)$(CCC) $(IOP_CFLAGS) -c -o $@ $<
+	$(QUIET_AS)$(TARGET_CC) $(IOP_CFLAGS) -c -o $@ $<
 
 $(MODULE_IOP): $(MODULE_LD) $(BUILTIN_LIB)
 $(MODULE_IOP): %.iop : %.mod.o
 $(MODULE_IOP): %.iop : %.sym.o
 $(MODULE_IOP): %.iop : %.o
-	$(QUIET_LINK)$(CLD) $(IOP_LDFLAGS) -o $@ $<			\
+	$(QUIET_LINK)$(TARGET_LD) $(IOP_LDFLAGS) -o $@ $<			\
 		$(@:%.iop=%.mod.o)					\
 		$(@:%.iop=%.sym.o) $(BUILTIN_LIB)
 
@@ -58,5 +58,5 @@ $(MODULE_IRX): $(IOPMOD_LINK)
 
 $(MODULE_IRX): %.irx : %.iop
 	$(QUIET_LINK)$(IOPMOD_LINK) --strip -o $@ $<
-	$(QUIET_LINK)$(CROSS_COMPILE)objcopy $@ $@
+	$(QUIET_LINK)$(TARGET_OBJCOPY) $@ $@
 	$(QUIET_LINK)$(IOPMOD_LINK) -o $@ $@
