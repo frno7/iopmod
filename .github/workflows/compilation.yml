@@ -1,4 +1,4 @@
-name: Compile IOP modules and tools
+name: build
 
 on:
   push:
