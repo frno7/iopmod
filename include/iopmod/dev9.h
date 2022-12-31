@@ -3,12 +3,20 @@
 #ifndef IOPMOD_DEV9_H
 #define IOPMOD_DEV9_H
 
-#define SSBUS_REG_1418 0xbf801418
-#define SSBUS_REG_141c 0xbf80141c
-#define SSBUS_REG_1420 0xbf801420
+#include "iopmod/module-prototype.h"
+#include "iopmod/module/dev9.h"
 
-#define DEV9_REGBASE 0xbf801460
-#define DEV9_REG(reg) (DEV9_REGBASE + 2 * (reg))
+#define SSBUS_REG_1418	0xbf801418
+#define SSBUS_REG_141c	0xbf80141c
+#define SSBUS_REG_1420	0xbf801420
+
+#define DEV9_REGBASE	0xbf801460
+#define DEV9_REG(reg)	(DEV9_REGBASE + 2 * (reg))
+
+#define DEV9_DMAC_BASE	0xbf801510
+#define DEV9_DMAC_MADR	DEV9_DMAC_BASE
+#define DEV9_DMAC_BCR	(DEV9_DMAC_BASE + 0x04)
+#define DEV9_DMAC_CHCR	(DEV9_DMAC_BASE + 0x08)
 
 enum {
 	DEV9_REG_1460, DEV9_REG_1462, DEV9_REG_1464, DEV9_REG_1466,

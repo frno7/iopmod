@@ -15,4 +15,13 @@
 #define SPD_REG_INTR_STAT	0x28
 #define SPD_REG_INTR_MASK	0x2a
 
+#define SPD_REG_XFR_CTRL	0x32
+#define SPD_REG_0x38		0x38
+#define SPD_REG_IF_CTRL		0x64
+#define   SPD_IF_ATA_RESET	  0x80
+#define   SPD_IF_DMA_ENABLE	  0x04
+#define SPD_REG_PIO_MODE	0x70
+#define SPD_REG_MWDMA_MODE	0x72
+#define SPD_REG_UDMA_MODE	0x74
+
 #endif /* IOPMOD_SPD_H */

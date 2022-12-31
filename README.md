@@ -19,9 +19,10 @@ for example the command `make CROSS_COMPILE=mipsr5900el-unknown-linux-gnu-`.
 
 ## Modules
 
-Currently four modules are implemented:
+Currently five modules are implemented:
 [`irq`](module/irq.c),
 [`irqrelay`](module/irqrelay.c),
+[`dev9`](module/dev9.c),
 [`gamepad`](module/gamepad.c) and
 [`printk`](module/printk.c).
 
