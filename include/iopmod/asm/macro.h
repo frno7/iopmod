@@ -7,6 +7,15 @@
 #define __ALIGN_IOPMOD(x, a) __ALIGN_IOPMOD_MASK(x, (typeof(x))(a) - 1)
 #define ALIGN(x, a) __ALIGN_IOPMOD((x), (a))
 
+/**
+ * ALIGNED - is it aligned?
+ * @x: item to check for alignment
+ * @a: alignment integer, must be a power of 2
+ *
+ * Return: %true if aligned, otherwise %false
+ */
+#define ALIGNED(x, a) (((x) & ((typeof(x))(a) - 1)) == 0)
+
 #define STR(x) #x
 #define XSTR(x) STR(x)
 
