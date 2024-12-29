@@ -1,15 +1,16 @@
-name: build
+name: Compile IOP modules
 
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   modules:
     runs-on: ubuntu-latest
     container: ghcr.io/${{ github.repository_owner }}/gentoo-mipsr5900el:main
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Arcive tag
         run: |
@@ -17,23 +18,31 @@ jobs:
 
       - name: Compile IOP modules
         run: |
-          make module CROSS_COMPILE=mipsr5900el-unknown-linux-gnu- V=1
+          # Avoid fatal: unsafe repository ('/home/runner/work/iopmod/iopmod' is owned by someone else)
+          # Confer https://github.com/actions/checkout/issues/760
+          git config --global --add safe.directory "$PWD"
+          JOBS="$(getconf _NPROCESSORS_ONLN)"
+          make -j"$JOBS" V=1 module CROSS_COMPILE=mipsr5900el-unknown-linux-gnu-
+          # Embed a tar file in the uploaded zip to retain file permissions.
           tar czvf iopmod-modules-${{ env.ARCHIVE_TAG }}.tar.gz module/*.irx
 
       - name: Publish IOP modules
         if: ${{ success() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "iopmod-modules-${{ env.ARCHIVE_TAG }}"
+          if-no-files-found: error
+          compression-level: 9
           path: iopmod-modules-${{ env.ARCHIVE_TAG }}.tar.gz
 
   tools:
     strategy:
+      fail-fast: false  # 'false' means don't stop if some archs fail.
       matrix:
         arch: [ppc64le, aarch64, x86_64]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Arcive tag
         run: |
@@ -51,19 +60,28 @@ jobs:
             apt-get install -q -y git make gcc libc-dev
           run: |
             # Avoid fatal: unsafe repository ('/home/runner/work/iopmod/iopmod' is owned by someone else)
+            # Confer https://github.com/actions/checkout/issues/760
             git config --global --add safe.directory "$PWD"
-            make tool LDFLAGS=-static V=1
+            JOBS="$(getconf _NPROCESSORS_ONLN)"
+            make -j"$JOBS" tool LDFLAGS=-static V=1
+            # Embed a tar file in the uploaded zip to retain file permissions.
             tar czvf "iopmod-tools-${{ env.ARCHIVE_TAG }}.tar.gz" tool/iopmod-{info,link,symc}
 
       - name: Compile x86_64 IOP tools
         if: ${{ matrix.arch == 'x86_64' }}
         run: |
-          make tool LDFLAGS=-static V=1
+          JOBS="$(getconf _NPROCESSORS_ONLN)"
+          make -j"$JOBS" V=1 S=1 tool
+          git clean -fdx
+          make -j"$JOBS" V=1 tool LDFLAGS=-static
+          # Embed a tar file in the uploaded zip to retain file permissions.
           tar czvf "iopmod-tools-${{ env.ARCHIVE_TAG }}.tar.gz" tool/iopmod-{info,link,symc}
 
       - name: Publish IOP tools
         if: ${{ success() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "iopmod-tools-${{ env.ARCHIVE_TAG }}"
+          if-no-files-found: error
+          compression-level: 9
           path: iopmod-tools-${{ env.ARCHIVE_TAG }}.tar.gz
