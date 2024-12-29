@@ -8,7 +8,7 @@ CFLAGS =
 
 ifeq (1,$(S))
 S_CFLAGS = -fsanitize=address -fsanitize=leak -fsanitize=undefined	\
-	  -fsanitize-address-use-after-scope -fstack-check
+	  -fsanitize-address-use-after-scope
 endif
 
 DEP_CFLAGS = -Wp,-MMD,$(@D)/$(@F).d -MT $(@D)/$(@F)
