@@ -3,6 +3,7 @@
 BUILTIN_SRC = $(addprefix builtin/,					\
 	interrupt.c							\
 	ioperr.c							\
+	memcmp.c							\
 	memcpy.c							\
 	memset.c							\
 	printk.c							\
