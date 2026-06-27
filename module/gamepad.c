@@ -29,8 +29,8 @@ enum {				  /* Times in us */
 	CONTROLLER_QUERY_POLL     =       100000, /*  10 Hz device query     */
 	CONTROLLER_ACTIVE_POLL    =         5000, /* 200 Hz device active    */
 	CONTROLLER_PASSIVE_POLL   =       100000, /*  10 Hz device passive   */
-	CONTROLLER_SCHEDULE_TIME  =         4000, /* Schedule at least 4 ms  */
-	CONTROLLER_IDLE_TIME      =   10*1000000, /* Idle after 10 seconds   */
+	CONTROLLER_SCHEDULE_TIME  =         1000, /* Schedule at least 1 ms  */
+	CONTROLLER_IDLE_TIME      =  180*1000000, /* Idle after 180 seconds   */
 };
 
 #define SIO2_CTRL_SETTINGS						\
@@ -122,9 +122,9 @@ static void info_activity(const struct gamepad_controller *ctrl, bool active)
 
 	last_activity[i] = active;
 
-	pr_info("gamepad: Controller %d %s\n",
-		port_id(ctrl),
-		active ? "active" : "passive");
+	pr_debug("gamepad: Controller %d %s\n",
+		 port_id(ctrl),
+		 active ? "active" : "passive");
 }
 
 #define DECLARE_TX_FN(tx_fn_)						\
@@ -172,8 +172,8 @@ static struct port_transition gamepad_rx_error(
 	struct gamepad_controller *ctrl, const struct gamepad_clock now)
 {
 	if (ctrl->state.device.mode) {
-		pr_info("gamepad: Controller %d disconnected\n",
-			port_id(ctrl));
+		pr_debug("gamepad: Controller %d disconnected\n",
+			 port_id(ctrl));
 
 		ctrl->state.device.mode = 0;  /* Indicate disconnected */
 
@@ -215,6 +215,16 @@ static bool gamepad_device_mode_is_analog(
 	       ctrl->state.device.mode == 0x79;
 }
 
+static bool gamepad_device_is_dualshock(
+	const struct gamepad_controller *ctrl)
+{
+	return (gamepad_device_mode_is_digital(ctrl) ||
+		gamepad_device_mode_is_analog(ctrl)) &&
+	       ctrl->state.model.type == 1 &&
+	       ctrl->state.model.modes == 2 &&
+	       ctrl->state.model.actuators == 2;
+}
+
 static bool gamepad_device_is_dualshock2(
 	const struct gamepad_controller *ctrl)
 {
@@ -228,10 +238,9 @@ static bool gamepad_device_is_dualshock2(
 static enum gamepad_device_id gamepad_device_id(
 	const struct gamepad_controller *ctrl)
 {
-	if (gamepad_device_is_dualshock2(ctrl))
-		return GAMEPAD_DEVICE_DUALSHOCK2;
-
-	return GAMEPAD_DEVICE_UNDEFINED;
+	return gamepad_device_is_dualshock(ctrl)  ? GAMEPAD_DEVICE_DUALSHOCK  :
+	       gamepad_device_is_dualshock2(ctrl) ? GAMEPAD_DEVICE_DUALSHOCK2 :
+						    GAMEPAD_DEVICE_UNDEFINED;
 }
 
 static const char *gamepad_device_name(const struct gamepad_controller *ctrl)
@@ -297,10 +306,10 @@ static struct port_transition gamepad_rx_enter_config_mode(
 
 	ctrl->state.device.mode = rx_data[1];
 
-	pr_info("gamepad: Controller %d enters config mode with device mode %s (%02x)\n",
-		port_id(ctrl),
-		gamepad_device_mode_name(ctrl->state.device.mode),
-		ctrl->state.device.mode);
+	pr_debug("gamepad: Controller %d enters config mode with device mode %s (%02x)\n",
+		 port_id(ctrl),
+		 gamepad_device_mode_name(ctrl->state.device.mode),
+		 ctrl->state.device.mode);
 
 	return (struct port_transition) {
 		.at = TRANSITION_AT(CONTROLLER_QUERY_POLL),
@@ -336,7 +345,7 @@ static struct port_transition gamepad_rx_exit_config_mode(
 			rx_data[6], rx_data[7], rx_data[8]);
 	}
 
-	pr_info("gamepad: Controller %d exits config mode\n", port_id(ctrl));
+	pr_debug("gamepad: Controller %d exits config mode\n", port_id(ctrl));
 
 	return (struct port_transition) {
 		.at = TRANSITION_AT(CONTROLLER_QUERY_POLL),
@@ -378,15 +387,15 @@ static struct port_transition gamepad_rx_query_model(
 		.actuators = rx_data[6],
 	};
 
-	pr_info("gamepad: Controller %d as %s "
-		"model type %02x modes %d mode %02x actuators %d %02x %02x\n",
-		port_id(ctrl), gamepad_device_name(ctrl),
-		ctrl->state.model.type,
-		ctrl->state.model.modes,
-		ctrl->state.model.mode,
-		ctrl->state.model.actuators,
-		rx_data[7],
-		rx_data[8]);
+	pr_debug("gamepad: Controller %d as %s "
+		 "model type %02x modes %d mode %02x actuators %d %02x %02x\n",
+		 port_id(ctrl), gamepad_device_name(ctrl),
+		 ctrl->state.model.type,
+		 ctrl->state.model.modes,
+		 ctrl->state.model.mode,
+		 ctrl->state.model.actuators,
+		 rx_data[7],
+		 rx_data[8]);
 
 	if (ctrl->state.model.actuators >= 2)
 		return (struct port_transition) {
@@ -487,10 +496,10 @@ static struct port_transition gamepad_rx_read_data(
 	if (ctrl->state.device.mode != rx_data[1]) {
 		ctrl->state.device.mode = rx_data[1];
 
-		pr_info("gamepad: Controller %d device mode change %s (%02x)\n",
-			port_id(ctrl),
-			gamepad_device_mode_name(ctrl->state.device.mode),
-			ctrl->state.device.mode);
+		pr_debug("gamepad: Controller %d device mode change %s (%02x)\n",
+			 port_id(ctrl),
+			 gamepad_device_mode_name(ctrl->state.device.mode),
+			 ctrl->state.device.mode);
 
 		/*
 		 * Enter config mode after device mode change,
@@ -645,10 +654,10 @@ static void gamepad_sif_cmd(const struct sif_cmd_header *header, void *arg)
 
 		ps->p[rumble.index].ctrl.rumble = rumble;
 
-		pr_info("rumble index %d small %d large %d\n",
-			rumble.index,
-			rumble.small,
-			rumble.large);
+		pr_debug("rumble index %d small %d large %d\n",
+			 rumble.index,
+			 rumble.small,
+			 rumble.large);
 		break;
 	}
 	default:
@@ -770,7 +779,7 @@ static enum module_init_status gamepad_init(int argc, char *argv[])
 {
 	static struct event_state ev = { };
 
-	pr_info("gamepad: Initialise\n");
+	pr_debug("gamepad: Initialise\n");
 
 	if (!gamepad_init_sio2(&ev))
 		return MODULE_EXIT;
@@ -780,7 +789,7 @@ static enum module_init_status gamepad_init(int argc, char *argv[])
 
 	sif_request_cmd(SIF_CMD_GAMEPAD, gamepad_sif_cmd, &ev.ps);
 
-	pr_info("gamepad: Ready\n");
+	pr_debug("gamepad: Ready\n");
 
 	return MODULE_RESIDENT;
 
