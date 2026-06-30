@@ -94,10 +94,14 @@ struct gamepad_controller_state {
 
 /**
  * enum iop_gamepad_ops - IOP gamepad remote operations
- * @rop_rumble: activate rumble for a given controller
+ * @gamepad_rop_open: called when the very first user opens the device
+ * @gamepad_rop_close: called when the very last user closes the device
+ * @gamepad_rop_rumble: activate rumble for a given controller
  */
 enum iop_gamepad_rops {
-	gamepad_rop_rumble = 0,
+	gamepad_rop_open   = 0,
+	gamepad_rop_close  = 1,
+	gamepad_rop_rumble = 2,
 };
 
 struct gamepad_sif_opt {

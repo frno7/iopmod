@@ -25,12 +25,13 @@
 #include "iopmod/asm/macro.h"
 
 enum {				  /* Times in us */
+	CONTROLLER_CLOSED_POLL    =       500000, /*   2 Hz device closed    */
 	CONTROLLER_DISCOVERY_POLL =       500000, /*   2 Hz device discovery */
 	CONTROLLER_QUERY_POLL     =       100000, /*  10 Hz device query     */
 	CONTROLLER_ACTIVE_POLL    =         5000, /* 200 Hz device active    */
 	CONTROLLER_PASSIVE_POLL   =       100000, /*  10 Hz device passive   */
 	CONTROLLER_SCHEDULE_TIME  =         1000, /* Schedule at least 1 ms  */
-	CONTROLLER_IDLE_TIME      =  180*1000000, /* Idle after 180 seconds   */
+	CONTROLLER_IDLE_TIME      =  180*1000000, /* Idle after 180 seconds  */
 };
 
 #define SIO2_CTRL_SETTINGS						\
@@ -47,6 +48,7 @@ struct gamepad_clock { u64 t; };		/* Time in us */
 struct gamepad_controller {
 	struct gamepad_clock change;
 	struct gamepad_cmd_rumble rumble;
+	bool open;
 	struct gamepad_controller_state state;
 };
 
@@ -146,9 +148,16 @@ DECLARE_TX_RX_FN(enter_config_mode);
 DECLARE_TX_RX_FN(exit_config_mode);
 DECLARE_TX_RX_FN(query_model);
 DECLARE_TX_RX_FN(actuator_align);
+DECLARE_TX_RX_FN(pressure_keys);
 DECLARE_TX_RX_FN(read_data);
 
-#define TRANSITION_AT(dt) ((struct gamepad_clock) { .t = (now).t + (dt) })
+static struct gamepad_clock transition_at(struct gamepad_controller *ctrl,
+	const struct gamepad_clock now, const u32 dt)
+{
+	return (struct gamepad_clock) {
+		.t = now.t + (ctrl->open ? dt : CONTROLLER_CLOSED_POLL)
+	};
+}
 
 #define EXPECT_RX_DATA(...)						\
 	({								\
@@ -184,7 +193,7 @@ static struct port_transition gamepad_rx_error(
 		{ .state = { .port = { .index = ctrl->state.port.index } } };
 
 	return (struct port_transition) {
-		.at = TRANSITION_AT(CONTROLLER_DISCOVERY_POLL),
+		.at = transition_at(ctrl, now, CONTROLLER_DISCOVERY_POLL),
 		.tx_fn = gamepad_tx_enter_config_mode,
 	};
 }
@@ -208,11 +217,23 @@ static bool gamepad_device_mode_is_digital(
 	return ctrl->state.device.mode == 0x41;
 }
 
+static bool gamepad_device_mode_is_analog_dualshock(
+	const struct gamepad_controller *ctrl)
+{
+	return ctrl->state.device.mode == 0x73;
+}
+
+static bool gamepad_device_mode_is_analog_dualshock2(
+	const struct gamepad_controller *ctrl)
+{
+	return ctrl->state.device.mode == 0x79;
+}
+
 static bool gamepad_device_mode_is_analog(
 	const struct gamepad_controller *ctrl)
 {
-	return ctrl->state.device.mode == 0x73 ||
-	       ctrl->state.device.mode == 0x79;
+	return gamepad_device_mode_is_analog_dualshock(ctrl) ||
+	       gamepad_device_mode_is_analog_dualshock2(ctrl);
 }
 
 static bool gamepad_device_is_dualshock(
@@ -288,7 +309,7 @@ static struct port_transition gamepad_rx_enter_config_mode(
 	    rx_data[1] == 0xff &&
 	    rx_data[2] == 0xff)		/* Disconnected */
 		return (struct port_transition) {
-			.at = TRANSITION_AT(CONTROLLER_DISCOVERY_POLL),
+			.at = transition_at(ctrl, now, CONTROLLER_DISCOVERY_POLL),
 			.tx_fn = gamepad_tx_enter_config_mode,
 		};
 
@@ -299,7 +320,7 @@ static struct port_transition gamepad_rx_enter_config_mode(
 			port_id(ctrl), rx_data[0], rx_data[1], rx_data[2]);
 
 		return (struct port_transition) {
-			.at = TRANSITION_AT(CONTROLLER_QUERY_POLL),
+			.at = transition_at(ctrl, now, CONTROLLER_QUERY_POLL),
 			.tx_fn = gamepad_tx_read_data,
 		};
 	}
@@ -312,7 +333,7 @@ static struct port_transition gamepad_rx_enter_config_mode(
 		 ctrl->state.device.mode);
 
 	return (struct port_transition) {
-		.at = TRANSITION_AT(CONTROLLER_QUERY_POLL),
+		.at = transition_at(ctrl, now, CONTROLLER_QUERY_POLL),
 		.tx_fn = gamepad_tx_query_model,
 	};
 }
@@ -348,7 +369,7 @@ static struct port_transition gamepad_rx_exit_config_mode(
 	pr_debug("gamepad: Controller %d exits config mode\n", port_id(ctrl));
 
 	return (struct port_transition) {
-		.at = TRANSITION_AT(CONTROLLER_QUERY_POLL),
+		.at = transition_at(ctrl, now, CONTROLLER_QUERY_POLL),
 		.tx_fn = gamepad_tx_read_data,
 	};
 }
@@ -399,12 +420,12 @@ static struct port_transition gamepad_rx_query_model(
 
 	if (ctrl->state.model.actuators >= 2)
 		return (struct port_transition) {
-			.at = TRANSITION_AT(CONTROLLER_QUERY_POLL),
+			.at = transition_at(ctrl, now, CONTROLLER_QUERY_POLL),
 			.tx_fn = gamepad_tx_actuator_align,
 		};
 
 	return (struct port_transition) {
-		.at = TRANSITION_AT(CONTROLLER_QUERY_POLL),
+		.at = transition_at(ctrl, now, CONTROLLER_QUERY_POLL),
 		.tx_fn = gamepad_tx_exit_config_mode,
 	};
 }
@@ -436,20 +457,51 @@ static struct port_transition gamepad_rx_actuator_align(
 			rx_data[3], rx_data[4], rx_data[5],
 			rx_data[6], rx_data[7], rx_data[8]);
 
+	if (gamepad_device_is_dualshock2(ctrl) &&
+	    gamepad_device_mode_is_analog(ctrl))
+		return (struct port_transition) {
+			.at = transition_at(ctrl, now, CONTROLLER_QUERY_POLL),
+			.tx_fn = gamepad_tx_pressure_keys,
+		};
+
 	return (struct port_transition) {
-		.at = TRANSITION_AT(CONTROLLER_QUERY_POLL),
+		.at = transition_at(ctrl, now, CONTROLLER_QUERY_POLL),
 		.tx_fn = gamepad_tx_exit_config_mode,
 	};
 }
 
-static inline bool device_is_digital(const struct gamepad_controller *ctrl)
+static struct port_exchange gamepad_tx_pressure_keys(
+	struct gamepad_controller *ctrl, const struct gamepad_clock now)
 {
-	return ctrl->state.device.mode == 0x41;
+	static const u8 data[] = {
+		1, 'O', 0, 0xff, 0xff, 0x03, 0x00, 0x00, 0x00
+	};
+
+	return (struct port_exchange) {
+		.tx_size = ARRAY_SIZE(data),
+		.rx_size = ARRAY_SIZE(data),
+		.tx_data = data,
+		.rx_fn = gamepad_rx_pressure_keys,
+	};
 }
 
-static inline bool device_is_analog(const struct gamepad_controller *ctrl)
+static struct port_transition gamepad_rx_pressure_keys(
+	struct gamepad_controller *ctrl, const struct gamepad_clock now,
+	u32 rx_size, const u8 *rx_data)
 {
-	return !device_is_digital(ctrl);
+	if (rx_data[0] != 0xff ||
+	    rx_data[1] != 0xf3 ||
+	    rx_data[2] != 'Z')
+		pr_warn("gamepad: Controller %d unexpected pressure keys: "
+			"%02x %02x %02x %02x %02x %02x %02x %02x\n",
+			port_id(ctrl),
+			rx_data[0], rx_data[1], rx_data[2], rx_data[3],
+			rx_data[4], rx_data[5], rx_data[6], rx_data[7]);
+
+	return (struct port_transition) {
+		.at = transition_at(ctrl, now, CONTROLLER_QUERY_POLL),
+		.tx_fn = gamepad_tx_exit_config_mode,
+	};
 }
 
 static struct port_exchange gamepad_tx_read_data(
@@ -466,7 +518,9 @@ static struct port_exchange gamepad_tx_read_data(
 
 	return (struct port_exchange) {
 		.tx_size = sizeof(port->tx_data.read_data),
-		.rx_size = device_is_digital(ctrl) ? 5 : 21,
+		.rx_size =
+			gamepad_device_mode_is_analog_dualshock2(ctrl) ? 21 :
+			gamepad_device_mode_is_analog_dualshock(ctrl)  ?  9 : 5,
 		.tx_data = port->tx_data.read_data.byte,
 		.rx_fn = gamepad_rx_read_data,
 	};
@@ -479,9 +533,8 @@ static bool controller_change(const struct gamepad_controller *ctrl,
 	    rx_data[4] != ctrl->state.digital.byte[1])
 		return true;
 
-	if (device_is_analog(ctrl) && rx_size == 21)
-		return memcmp(&rx_data[5], ctrl->state.analog.byte,
-			sizeof(ctrl->state.analog));
+	if (gamepad_device_mode_is_analog(ctrl) && rx_size > 5)
+		return memcmp(&rx_data[5], ctrl->state.analog.byte, rx_size - 5);
 
 	return false;
 }
@@ -506,7 +559,7 @@ static struct port_transition gamepad_rx_read_data(
 		 * to realign (rumble) actuators, and so on.
 		 */
 		return (struct port_transition) {
-			.at = TRANSITION_AT(CONTROLLER_QUERY_POLL),
+			.at = transition_at(ctrl, now, CONTROLLER_QUERY_POLL),
 			.tx_fn = gamepad_tx_enter_config_mode,
 		};
 	}
@@ -523,9 +576,8 @@ static struct port_transition gamepad_rx_read_data(
 	ctrl->state.digital.byte[0] = rx_data[3];
 	ctrl->state.digital.byte[1] = rx_data[4];
 
-	if (device_is_analog(ctrl) && rx_size == 21)
-		memcpy(ctrl->state.analog.byte, &rx_data[5],
-			sizeof(ctrl->state.analog));
+	if (gamepad_device_mode_is_analog(ctrl) && rx_size > 5)
+		memcpy(ctrl->state.analog.byte, &rx_data[5], rx_size - 5);
 
 	ctrl->change = now;
 
@@ -533,7 +585,7 @@ static struct port_transition gamepad_rx_read_data(
 
 out:
 	return (struct port_transition) {
-		.at = TRANSITION_AT(active ?
+		.at = transition_at(ctrl, now, active ?
 			CONTROLLER_ACTIVE_POLL : CONTROLLER_PASSIVE_POLL),
 		.tx_fn = gamepad_tx_read_data,
 	};
@@ -649,17 +701,30 @@ static void gamepad_sif_cmd(const struct sif_cmd_header *header, void *arg)
 
 	switch (opt.op)
 	{
+	case gamepad_rop_open:
+		ps->p[opt.data].ctrl.open = true;
+
+		pr_debug("gamepad open index %d\n", opt.data);
+		break;
+
+	case gamepad_rop_close:
+		ps->p[opt.data].ctrl.open = false;
+
+		pr_debug("gamepad close index %d\n", opt.data);
+		break;
+
 	case gamepad_rop_rumble: {
 		const struct gamepad_cmd_rumble rumble = { .raw = opt.data };
 
 		ps->p[rumble.index].ctrl.rumble = rumble;
 
-		pr_debug("rumble index %d small %d large %d\n",
+		pr_debug("gamepad rumble index %d small %d large %d\n",
 			 rumble.index,
 			 rumble.small,
 			 rumble.large);
 		break;
 	}
+
 	default:
 		pr_err("%s: Unknown op %d\n", __func__, opt.op);
 	}
